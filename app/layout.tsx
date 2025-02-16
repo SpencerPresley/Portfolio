@@ -3,7 +3,6 @@ import { Inter } from "next/font/google";
 import LocalFont from "next/font/local";
 import { Metadata } from "next";
 import { Analytics } from "./components/analytics";
-import { StyleOverrideToast } from "./components/style-override-toast";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://spencerpresley.com"),
@@ -71,7 +70,6 @@ export default function RootLayout({
           }`}
       >
         {children}
-        <StyleOverrideToast />
       </body>
     </html>
   );

@@ -1,36 +1,21 @@
-export function checkForStyleOverrides() {
+export function checkForJsonPrettyPrinter(): boolean {
   if (typeof window === 'undefined') return false;
 
-  const criticalElements = [
-    { selector: '.bg-gradient-to-tl', property: 'background-image' },
-    { selector: '.from-black', property: 'background-color' },
-    { selector: 'canvas', property: 'background-color' }
-  ];
-
-  let hasOverrides = false;
-  criticalElements.forEach(({ selector, property }) => {
-    const element = document.querySelector(selector);
-    if (!element) return;
-
-    const computedStyle = window.getComputedStyle(element);
-    const appliedValue = computedStyle[property as any];
-    
-    // Get all stylesheets that aren't ours
-    const externalStylesheets = Array.from(document.styleSheets).filter(sheet => {
-      try {
-        const href = sheet.href;
-        if (!href) return false;
-        return !href.includes('portfolio-ten-blond-79.vercel.app') && 
-               !href.includes('spencerpresley.com');
-      } catch (e) {
-        return false; // CORS blocked stylesheet, likely an extension
-      }
-    });
-
-    if (externalStylesheets.length > 0) {
-      hasOverrides = true;
+  // JSON Pretty Printer often injects these styles
+  const hasJsonPrettyClass = document.querySelector('.json-pretty') !== null;
+  const hasJsonPrettyAttr = document.querySelector('[data-json-pretty]') !== null;
+  const hasJsonStyles = Array.from(document.styleSheets).some(sheet => {
+    try {
+      // Check for specific JSON Pretty Printer rules
+      const rules = Array.from(sheet.cssRules || []);
+      return rules.some(rule => 
+        rule.cssText?.includes('json-pretty') || 
+        rule.cssText?.includes('background-color: rgb(255, 255, 255)')
+      );
+    } catch (e) {
+      return false;
     }
   });
 
-  return hasOverrides;
+  return hasJsonPrettyClass || hasJsonPrettyAttr || hasJsonStyles;
 } 

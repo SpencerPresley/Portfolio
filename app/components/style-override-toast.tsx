@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { checkForStyleOverrides } from "@/util/style-check";
+import { checkForJsonPrettyPrinter } from "@/util/style-check";
 
 export function StyleOverrideToast() {
   const [showToast, setShowToast] = useState(false);
 
   useEffect(() => {
-    const hasOverrides = checkForStyleOverrides();
-    setShowToast(hasOverrides);
+    const hasJsonPrettyPrinter = checkForJsonPrettyPrinter();
+    setShowToast(hasJsonPrettyPrinter);
   }, []);
 
   if (!showToast) return null;
@@ -21,7 +21,7 @@ export function StyleOverrideToast() {
       <div className="flex gap-2">
         <div className="flex-1">
           <p className="text-sm">
-            Some browser extensions may affect the site's appearance. Consider disabling JSON Pretty Printer or similar styling extensions if the site looks unusual.
+            The JSON Pretty Printer extension is affecting this site's appearance. Please disable it for the best experience.
           </p>
         </div>
         <button 
