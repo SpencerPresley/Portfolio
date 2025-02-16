@@ -1,7 +1,8 @@
 "use client";
-import { ArrowLeft, Eye, Github, Twitter } from "lucide-react";
+import { ArrowLeft, Eye, Github, Linkedin } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
+import { getStatusColor, getStatusText, getStatusIcon } from "@/app/lib/status";
 
 type Props = {
 	project: {
@@ -9,6 +10,7 @@ type Props = {
 		title: string;
 		description: string;
 		repository?: string;
+		status?: string;
 	};
 
 	views: number;
@@ -67,8 +69,8 @@ export const Header: React.FC<Props> = ({ project, views }) => {
 								views,
 							)}
 						</span>
-						<Link target="_blank" href="https://twitter.com/chronark_">
-							<Twitter
+						<Link target="_blank" href="https://www.linkedin.com/in/spencerpresley96">
+							<Linkedin
 								className={`w-6 h-6 duration-200 hover:font-medium ${
 									isIntersecting
 										? " text-zinc-400 hover:text-zinc-100"
@@ -76,7 +78,7 @@ export const Header: React.FC<Props> = ({ project, views }) => {
 								} `}
 							/>
 						</Link>
-						<Link target="_blank" href="https://github.com/chronark">
+						<Link target="_blank" href="https://github.com/SpencerPresley">
 							<Github
 								className={`w-6 h-6 duration-200 hover:font-medium ${
 									isIntersecting
@@ -105,6 +107,12 @@ export const Header: React.FC<Props> = ({ project, views }) => {
 						<h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl font-display">
 							{project.title}
 						</h1>
+						{project.status && (
+							<span className={`mt-4 text-sm ${getStatusColor(project.status)} flex items-center gap-1.5 justify-center`}>
+								{getStatusIcon(project.status)}
+								{getStatusText(project.status)}
+							</span>
+						)}
 						<p className="mt-6 text-lg leading-8 text-zinc-300">
 							{project.description}
 						</p>

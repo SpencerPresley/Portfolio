@@ -6,6 +6,8 @@ import { Card } from "../components/card";
 import { Article } from "./article";
 import { Redis } from "@upstash/redis";
 import { Eye } from "lucide-react";
+import { getStatusColor, getStatusText, getStatusIcon } from "@/app/lib/status";
+import { getCategoryColor, getCategoryText, getCategoryIcon } from "@/app/lib/category";
 
 const redis = Redis.fromEnv();
 
@@ -20,9 +22,9 @@ export default async function ProjectsPage() {
     return acc;
   }, {} as Record<string, number>);
 
-  const featured = allProjects.find((project) => project.slug === "unkey")!;
-  const top2 = allProjects.find((project) => project.slug === "planetfall")!;
-  const top3 = allProjects.find((project) => project.slug === "highstorm")!;
+  const featured = allProjects.find((project) => project.slug === "academic_metrics")!;
+  const top2 = allProjects.find((project) => project.slug === "chain_composer")!;
+  const top3 = allProjects.find((project) => project.slug === "testifai")!;
   const sorted = allProjects
     .filter((p) => p.published)
     .filter(
@@ -46,8 +48,71 @@ export default async function ProjectsPage() {
             Projects
           </h2>
           <p className="mt-4 text-zinc-400">
-            Some of the projects are from work and some are on my own time.
+            Below are a collection of projects spanning from personal, hackathons, school, and internships. The dates represent approximately the time of the last commit to the corresponding repository.
           </p>
+          <div className="mt-4 flex flex-col gap-8">
+            <div className="flex flex-col gap-2">
+              <h3 className="text-lg font-semibold text-zinc-200">Project Status Key</h3>
+              <div className="flex items-center gap-2">
+                <div className={getStatusColor("in-dev")}>
+                  {getStatusIcon("in-dev")}
+                </div>
+                <span className="text-sm text-zinc-400">{getStatusText("in-dev")}: Initial development phase; core features under active development</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className={getStatusColor("ongoing")}>
+                  {getStatusIcon("ongoing")}
+                </div>
+                <span className="text-sm text-zinc-400">{getStatusText("ongoing")}: Live in production with regular feature updates and enhancements</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className={getStatusColor("complete")}>
+                  {getStatusIcon("complete")}
+                </div>
+                <span className="text-sm text-zinc-400">{getStatusText("complete")}: Feature-complete and stable; supported for critical updates and bug fixes</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className={getStatusColor("legacy")}>
+                  {getStatusIcon("legacy")}
+                </div>
+                <span className="text-sm text-zinc-400">{getStatusText("legacy")}: Stable and functional release; no longer actively maintained</span>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <h3 className="text-lg font-semibold text-zinc-200">Project Categories Key</h3>
+              {/* <div className="flex items-center gap-2">
+                <div className={getCategoryColor("research")}>
+                  {getCategoryIcon("research")}
+                </div>
+                <span className="text-sm text-zinc-400">{getCategoryText("research")}: Academic or industry research initiatives</span>
+              </div> */}
+              <div className="flex items-center gap-2">
+                <div className={getCategoryColor("internship")}>
+                  {getCategoryIcon("internship")}
+                </div>
+                <span className="text-sm text-zinc-400">{getCategoryText("internship")}: Projects developed during professional internships</span>
+              </div>
+              {/* <div className="flex items-center gap-2">
+                <div className={getCategoryColor("school project")}>
+                  {getCategoryIcon("school project")}
+                </div>
+                <span className="text-sm text-zinc-400">{getCategoryText("school project")}: Academic coursework and university projects</span>
+              </div> */}
+              <div className="flex items-center gap-2">
+                <div className={getCategoryColor("personal project")}>
+                  {getCategoryIcon("personal project")}
+                </div>
+                <span className="text-sm text-zinc-400">{getCategoryText("personal project")}: Independent projects and passion initiatives</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className={getCategoryColor("hackathon")}>
+                  {getCategoryIcon("hackathon")}
+                </div>
+                <span className="text-sm text-zinc-400">{getCategoryText("hackathon")}: Projects built during hackathons and coding competitions</span>
+              </div>
+            </div>
+          </div>
         </div>
         <div className="w-full h-px bg-zinc-800" />
 
@@ -56,15 +121,27 @@ export default async function ProjectsPage() {
             <Link href={`/projects/${featured.slug}`}>
               <article className="relative w-full h-full p-4 md:p-8">
                 <div className="flex items-center justify-between gap-2">
-                  <div className="text-xs text-zinc-100">
-                    {featured.date ? (
-                      <time dateTime={new Date(featured.date).toISOString()}>
-                        {Intl.DateTimeFormat(undefined, {
-                          dateStyle: "medium",
-                        }).format(new Date(featured.date))}
-                      </time>
-                    ) : (
-                      <span>SOON</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-zinc-100">
+                      {featured.date ? (
+                        <time dateTime={new Date(featured.date).toISOString()}>
+                          {Intl.DateTimeFormat(undefined, {
+                            dateStyle: "medium",
+                          }).format(new Date(featured.date))}
+                        </time>
+                      ) : (
+                        <span>SOON</span>
+                      )}
+                    </span>
+                    {featured.status && (
+                      <span className={`text-xs ${getStatusColor(featured.status)} flex items-center gap-1.5`}>
+                        • {getStatusIcon(featured.status)} {getStatusText(featured.status)}
+                      </span>
+                    )}
+                    {featured.category && (
+                      <span className={`text-xs ${getCategoryColor(featured.category)} flex items-center gap-1.5`}>
+                        • {getCategoryIcon(featured.category)} {getCategoryText(featured.category)}
+                      </span>
                     )}
                   </div>
                   <span className="flex items-center gap-1 text-xs text-zinc-500">
@@ -96,7 +173,7 @@ export default async function ProjectsPage() {
           <div className="flex flex-col w-full gap-8 mx-auto border-t border-gray-900/10 lg:mx-0 lg:border-t-0 ">
             {[top2, top3].map((project) => (
               <Card key={project.slug}>
-                <Article project={project} views={views[project.slug] ?? 0} />
+                <Article project={project} views={views[project.slug] ?? 0} layout="default" />
               </Card>
             ))}
           </div>
@@ -109,7 +186,7 @@ export default async function ProjectsPage() {
               .filter((_, i) => i % 3 === 0)
               .map((project) => (
                 <Card key={project.slug}>
-                  <Article project={project} views={views[project.slug] ?? 0} />
+                  <Article project={project} views={views[project.slug] ?? 0} layout="compact" />
                 </Card>
               ))}
           </div>
@@ -118,7 +195,7 @@ export default async function ProjectsPage() {
               .filter((_, i) => i % 3 === 1)
               .map((project) => (
                 <Card key={project.slug}>
-                  <Article project={project} views={views[project.slug] ?? 0} />
+                  <Article project={project} views={views[project.slug] ?? 0} layout="compact" />
                 </Card>
               ))}
           </div>
@@ -127,7 +204,7 @@ export default async function ProjectsPage() {
               .filter((_, i) => i % 3 === 2)
               .map((project) => (
                 <Card key={project.slug}>
-                  <Article project={project} views={views[project.slug] ?? 0} />
+                  <Article project={project} views={views[project.slug] ?? 0} layout="compact" />
                 </Card>
               ))}
           </div>

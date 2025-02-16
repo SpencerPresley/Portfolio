@@ -42,6 +42,16 @@ export const Project = defineDocumentType(() => ({
 		repository: {
 			type: "string",
 		},
+		status: {
+			type: "string",
+			options: ["in-dev", "ongoing", "complete", "legacy"],
+			default: "in-dev",
+		},
+		category: {
+			type: "string",
+			options: ["research", "internship", "school project", "personal project", "hackathon"],
+			default: "personal project",
+		},
 	},
 	computedFields,
 }));

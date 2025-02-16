@@ -1,0 +1,368 @@
+---
+title: Termbook
+description: A complete journaling system built to keep developers on their journaling journey. Termbook won Best Overall Hack at Bitcamp 2024, the largest hackathon on the east coast with over 2000 hackers.
+repository: jamesmontebell/termbook
+url: https://termbook.co/
+date: "2024-05-03"
+published: true
+status: "complete"
+category: "hackathon"
+
+---
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Key Features](#key-features)
+- [Technical Implementation](#technical-implementation)
+  - [CLI Application](#cli-application)
+  - [Backend Architecture](#backend-architecture)
+  - [Authentication System](#authentication-system)
+  - [API Integration](#api-integration)
+  - [Frontend Architecture](#frontend-architecture)
+- [Installation Guide](#installation-guide)
+- [Code Snippets](#code-snippets)
+
+## Overview
+
+Termbook is a **complete journaling system** built to keep developers on their journaling journey. The project won **Best Overall Hack** at **Bitcamp 2024**, hosted by **University of Maryland College Park** - the largest hackathon on the east coast with over **2000 hackers** present.
+
+Each time you open your terminal, you'll be prompted to enter a journal entry for the day (unless you already have). Our CLI program enforces a minimum of 50 words to encourage meaningful reflection and unburdening. The web application provides an elegant interface to view all your previous entries, with seamless GitHub authentication for developers. The best part is not even `ctrl+c` , or `cmd+c` for my fellow mac users, can stop you from journaling.
+
+## Key Features
+
+- **Terminal Integration**: Automatic journaling prompts when opening your terminal
+- **Minimum Word Count**: Enforces 50-word minimum for meaningful reflection
+- **Cross-Platform Support**: Works on Windows, Linux, and MacOS (both Intel and Apple Silicon)
+- **GitHub Authentication**: Seamless login with your existing GitHub account
+- **Cloud Sync**: All entries automatically synced to the web interface
+- **Protected API Routes**: Secure data handling with full authentication
+- **Responsive Design**: Modern UI built with Next.js and Tailwind
+- **SQLite Database**: Efficient local storage with modernc.org/sqlite
+- **Beautiful CLI**: Interactive terminal UI using Bubble Tea and Lip Gloss
+
+## Technical Implementation
+
+### CLI Application
+The terminal application is built with sophisticated Go libraries:
+- **Bubble Tea**: Powers the interactive terminal UI
+- **Lip Gloss**: Provides beautiful styling and layouts
+- **Progress Bars**: Visual feedback during loading
+- **Git Integration**: Automatic user detection via git config
+- **Word Count Validation**: Enforces meaningful entries
+- **Error Recovery**: Graceful handling of Ctrl+C attempts
+
+### Backend Architecture
+
+The server is built with modern Go practices:
+
+- **SQLite Database**: Using modernc.org/sqlite for pure Go implementation
+- **RESTful API**: Clean endpoint structure with proper HTTP methods
+- **Environment Management**: Custom env package for configuration
+- **Cross-Platform Builds**: Automated build scripts for all supported architectures
+- **Structured Logging**: Comprehensive error tracking
+- **Connection Pooling**: Efficient database connection management
+
+### Authentication System
+
+The authentication system leverages NextAuth.js with GitHub provider integration:
+
+- Secure OAuth flow with GitHub
+- Protected API routes
+- Server-side session validation
+- Automatic redirects for unauthenticated users
+
+### API Integration
+
+The backend API implements:
+
+- Protected endpoints with API secret validation
+- User-specific journal entry retrieval
+- Error handling and response formatting
+- Session-based authentication checks
+- 24-hour entry validation
+
+### Frontend Architecture
+
+Built with modern web technologies:
+
+- **Next.js** for server-side rendering and API routes
+- **Tailwind CSS** for responsive styling
+- **AOS** (Animate On Scroll) for smooth animations
+- **Particle Effects** for engaging UI elements
+- **Session Management** with NextAuth.js
+
+## Installation Guide
+
+Termbook supports multiple architectures:
+
+- Windows x32 and x64
+- Linux x32 and x64
+- MacOS Intel and Apple Silicon
+
+### Quick Install Steps:
+
+1. Download the appropriate binary from termbook.co
+2. Set executable permissions (Unix-based systems)
+3. Add to terminal configuration file (.zshrc, .bashrc, etc.)
+4. Configure system permissions
+5. Start journaling!
+
+For detailed installation instructions, visit our [documentation](https://termbook.co/docs).
+
+## Code Snippets
+
+### CLI Implementation
+
+```go
+func main() {
+    // Get GitHub username
+    cmd := exec.Command("git", "config", "user.email")
+    var outBuffer bytes.Buffer
+    cmd.Stdout = &outBuffer
+    err := cmd.Run()
+    if err != nil {
+        panic(err)
+    }
+    email := outBuffer.String()
+    email = email[:len(email)-1]
+
+    // Check if user has already journaled today
+    checkRes, err := http.Get("http://18.226.82.203:1234/timecheck/" + email)
+    var complete Completed
+    json.NewDecoder(checkRes.Body).Decode(&complete)
+
+    // Beautiful styling with Lip Gloss
+    var style = lipgloss.NewStyle().
+        Bold(true).
+        Foreground(lipgloss.Color("#FAFAFA")).
+        Background(lipgloss.Color("#22D3EE")).
+        Padding(2, 2, 2, 2).
+        Width(45).
+        Border(lipgloss.ThickBorder(), true, true).
+        BorderForeground(lipgloss.Color("#2563EB")).
+        BorderStyle(lipgloss.RoundedBorder())
+}
+```
+
+### Backend API Route
+
+```go
+func getUserEntries(w http.ResponseWriter, r *http.Request) {
+    if r.Header.Get("Authorization") != password {
+        w.WriteHeader(http.StatusForbidden)
+        return
+    }
+    email := r.PathValue("userEmail")
+    rows, err := dbConnection.Query(
+        "SELECT * FROM Entries WHERE userEmail=? ORDER BY time DESC", 
+        email
+    )
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+    defer rows.Close()
+
+    var entriesList []Entry
+    var entry Entry
+    for rows.Next() {
+        err := rows.Scan(&entry.UserEmail, &entry.Content, &entry.Time)
+        if err != nil {
+            http.Error(w, err.Error(), http.StatusInternalServerError)
+            return
+        }
+        entriesList = append(entriesList, entry)
+    }
+    jsonResult, err := json.Marshal(entriesList)
+    w.Write(jsonResult)
+}
+```
+
+### Frontend Authentication
+
+```typescript
+import NextAuth from "next-auth";
+import GithubProvider from "next-auth/providers/github";
+
+export const authOptions = {
+  providers: [
+    GithubProvider({
+      clientId: process.env.GITHUB_ID,
+      clientSecret: process.env.GITHUB_SECRET,
+    }),
+  ],
+};
+
+export default NextAuth(authOptions);
+```
+
+### Root Layout with Particles
+
+```typescript
+import React from "react";
+import { getServerSession } from "next-auth";
+import SessionProvider from "./components/SessionProvider";
+import NewNavBar from "./components/NewNavBar";
+import { Particles } from "../app/components/particles";
+import { Montserrat } from "next/font/google";
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  display: "swap",
+});
+
+export const metadata = {
+  title: "Termbook",
+  description: "Journaling for developers",
+};
+
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const session = await getServerSession();
+  return (
+    <html lang="en" className={`${montserrat.className}`}>
+      <body className="bg-[#121212] text-white">
+        <Particles className="absolute -z-10 min-h-screen w-full" />
+        <SessionProvider session={session}>
+          <div className="flex flex-col">
+            <NewNavBar />
+            <main>{children}</main>
+          </div>
+        </SessionProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+### Journal Entry Display
+
+```typescript
+"use client";
+import { useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
+import { useEffect, useState } from "react";
+import PostCard from "../components/postCard";
+import "aos/dist/aos.css";
+import "../globals.css";
+
+type Journal = {
+  content: string;
+  userEmail: string;
+  time: string;
+};
+
+export default function ProfileDetails() {
+  const { data: session } = useSession();
+  const [journals, setJournals] = useState<Journal[]>();
+  
+  if (!session || !session.user) {
+    redirect("/");
+  }
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  async function fetchData() {
+    try {
+      const response = await fetch("profile/api/journals");
+      const data = await response.json();
+      setJournals(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
+
+  return (
+    <div className="p-5">
+      <div 
+        className="p-5 grid grid-cols-5 gap-6 place-items-start h-[800px] overflow-y-scroll"
+        data-aos="fade-down"
+        data-aos-delay="200"
+      >
+        {journals?.map((journal, journalIndex) => (
+          <PostCard journal={journal} key={journalIndex} />
+        ))}
+      </div>
+    </div>
+  );
+}
+```
+
+### Protected API Route
+
+```typescript
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+
+export async function GET() {
+  const session = await getServerSession();
+  if (!session || !session.user) {
+    redirect("/api/auth/signin");
+  }
+  try {
+    const response = await fetch(
+      "http://18.226.82.203:1234/entries/" + session.user.email,
+      {
+        method: "GET",
+        headers: {
+          Authorization: process.env.API_SECRET ?? "",
+        },
+      }
+    );
+    return response;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return new Response("Failed:(");
+  }
+}
+```
+
+### Documentation Page
+
+```typescript
+"use client";
+import React from "react";
+import { useMDXComponents } from "../../mdx-components";
+import MDXContent from "./content.mdx";
+import { useEffect } from "react";
+import AOS from "aos";
+import "aos/dist/aos.css";
+import { Particles } from "../components/particles";
+
+export default function Page() {
+  const components = useMDXComponents({});
+  
+  useEffect(() => {
+    AOS.init({
+      disable: "phone",
+      duration: 800,
+      easing: "ease-out-cubic",
+    });
+  }, []);
+
+  return (
+    <div className="flex flex-col justify-center items-center min-h-screen pb-10 pt-10">
+      <div
+        className="bg-gradient-to-r from-gray-900 via-gray-950 to-black border border-cyan-700 
+          flex shadow-lg shadow-cyan-600 justify-center opacity-98 flex-grow w-3/4"
+        data-aos="fade-down"
+        data-aos-delay="200"
+      >
+        <article
+          className="prose text-left text-white prose-headings:text-white prose-code:text-white py-10"
+          data-aos="fade-down"
+          data-aos-delay="400"
+        >
+          <MDXContent components={components} />
+        </article>
+      </div>
+    </div>
+  );
+}
+``` 

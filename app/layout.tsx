@@ -5,20 +5,20 @@ import { Metadata } from "next";
 import { Analytics } from "./components/analytics";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://spencerpresley.com"),
   title: {
-    default: "chronark.com",
-    template: "%s | chronark.com",
+    default: "spencerpresley.com",
+    template: "%s | spencerpresley.com",
   },
-  description: "Co-founder of unkey.dev and founder of planetfall.io",
+  description: "Portfolio for Spencer Presley; author of Academic Metrics and ChainComposer",
   openGraph: {
-    title: "chronark.com",
-    description:
-      "Co-founder of unkey.dev and founder of planetfall.io",
-    url: "https://chronark.com",
-    siteName: "chronark.com",
+    title: "spencerpresley.com",
+    description: "Portfolio for Spencer Presley; author of Academic Metrics and ChainComposer",
+    url: "https://spencerpresley.com",
+    siteName: "spencerpresley.com",
     images: [
       {
-        url: "https://chronark.com/og.png",
+        url: "https://spencerpresley.com/og.png",
         width: 1920,
         height: 1080,
       },
@@ -38,12 +38,12 @@ export const metadata: Metadata = {
     },
   },
   twitter: {
-    title: "Chronark",
+    title: "Spencer Presley",
     card: "summary_large_image",
   },
-  icons: {
-    shortcut: "/favicon.png",
-  },
+  // icons: {
+  //   shortcut: "/favicon.png",
+  // },
 };
 const inter = Inter({
   subsets: ["latin"],

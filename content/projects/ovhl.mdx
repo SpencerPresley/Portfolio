@@ -1,0 +1,1920 @@
+---
+title: "Online Virtual Hockey League (OVHL)"
+description: A comprehensive platform for managing and participating in competitive virtual hockey leagues through EA Sports' NHL series. Features multi-tier league management, team organization, and community engagement tools.
+repository: SpencerPresley/OVHL
+date: "2025-02-15"
+published: true
+status: "in-dev"
+category: "personal project"
+
+---
+
+OVHL is a modern web platform built with Next.js that provides a comprehensive system for managing competitive virtual hockey leagues. The platform supports multiple tiers of competition (NHL, AHL, ECHL, CHL) with sophisticated team and player management capabilities.
+
+The system features a robust architecture using **Next.js 15** and **React 19** with **TypeScript**, **Prisma** for database management, and a suite of modern UI components powered by [shadcn](https://ui.shadcn.com/). It implements real-time notifications, forum functionality, and detailed statistics tracking across all league tiers.
+
+## Table of Contents
+- [Key Features](#key-features)
+- [Technical Stack](#technical-stack)
+- [Upcoming Features](#upcoming-features)
+  - [Live Bidding System](#live-bidding-system)
+  - [Drafting System](#drafting-system)
+  - [Twitch Integration](#twitch-integration)
+- [Code Snippets](#code-snippets)
+  - [Real Time Notification API](#real-time-notification-api)
+  - [ChatBox Component featuring Ably](#chatbox-component-featuring-ably)
+  - [Teams' Rosters Display Component](#teams-rosters-display-component)
+  - [Prisma Schema](#prisma-schema)
+
+## Key Features
+- Multi-tier league management system with support for NHL, AHL, ECHL, and CHL divisions
+- Comprehensive team and player management with contract handling
+- Forum system with markdown support and rich text editing
+- Real time notifications and an **Ably** powered live chat system
+- Authentication and 'remember me'system with **JWT** and **HTTP-only cookies**
+- Responsive design with dark mode support
+- Admin dashboard for league management
+- Statistics tracking and visualization using Recharts
+
+## Technical Stack
+From a technical perspective, the system is built with developer experience in mind, featuring:
+- Type-safe database operations with **Prisma**
+- Component-driven architecture using **shadcn**
+- Comprehensive testing setup with **Jest** and **Playwright**
+- Modern styling with **Tailwind CSS**
+- Markdown processing with syntax highlighting using **remark**
+- Efficient state management and data fetching
+
+Whether you're managing a virtual hockey organization or participating as a player, OVHL provides the tools needed for a comprehensive competitive gaming experience. The platform emphasizes community engagement while maintaining professional league management capabilities.
+
+## Upcoming Features
+
+###### Live Bidding System
+Members of OVHL can sign-up for quarterly seasons. Some members will be team managers and others players. Team managers can bid on player to form their team.
+
+The bidding system will feature **redis** caching for performance.
+
+###### Drafting System
+In OVHL when you sign-up you'll first be a prospect. As a prospect you'll play your first season in the CHL. Upon completion of the CHL season you'll be draft eligible.
+
+Managers of teams will be able to draft prospects to help form their team.
+
+###### Twitch Integration
+OVHL will feature rich Twitch integration using the **Twitch Developer API**, allowing users to link their Twitch account to their OVHL account and have their streams advertised on the OVHL website.
+
+##### Code Snippets
+Below are a collection of code snippets that show off my full-stack and database skills. Each snippet includes a link to view the full source code on GitHub.
+
+###### Real Time Notification API
+
+<a href="https://github.com/SpencerPresley/OVHL/blob/main/src/app/api/notifications/sse/route.ts" target="_blank" rel="noopener noreferrer">View source →</a>
+
+```typescript
+/**
+ * @file route.ts
+ * @author Spencer Presley
+ * @version 1.0.0
+ * @license Proprietary - Copyright (c) 2025 Spencer Presley
+ * @copyright All rights reserved. This code is the exclusive property of Spencer Presley.
+ * @notice Unauthorized copying, modification, distribution, or use is strictly prohibited.
+ *
+ * @description Server-Sent Events (SSE) API Route for Real-Time Notifications
+ * @module api/notifications/sse
+ *
+ * @requires next/server
+ * @requires jsonwebtoken
+ * @requires @prisma/client
+ *
+ * Server-Sent Events (SSE) Notification Streaming Endpoint
+ *
+ * Features:
+ * - Persistent real-time notification connection
+ * - JWT-based authentication
+ * - Efficient connection management
+ * - Automatic reconnection handling
+ *
+ * Technical Implementation:
+ * - Uses ReadableStream for efficient data streaming
+ * - Periodic ping to maintain connection
+ * - Secure token validation
+ * - Graceful error handling
+ *
+ * Performance Considerations:
+ * - Minimal server resource consumption
+ * - Low-latency notification delivery
+ * - Scalable connection management
+ *
+ * @example
+ * // Client-side SSE connection
+ * const eventSource = new EventSource('/api/notifications/sse');
+ * eventSource.onmessage = (event) => {
+ *   const notifications = JSON.parse(event.data);
+ *   // Handle notifications
+ * };
+ */
+
+import { prisma } from '@/lib/prisma';
+import { NotificationStatus } from '@/types/notifications';
+import { cookies } from 'next/headers';
+import { verify } from 'jsonwebtoken';
+
+/**
+ * TextEncoder instance for converting strings to Uint8Array
+ * Used for SSE message encoding
+ */
+const encoder = new TextEncoder();
+
+/**
+ * GET handler for SSE notifications endpoint
+ *
+ * Establishes a persistent SSE connection and streams notifications to authenticated users.
+ * The connection:
+ * - Validates user authentication via JWT
+ * - Sends periodic pings (every 5s) to keep connection alive
+ * - Checks for new notifications on each ping
+ * - Handles connection cleanup on client disconnect
+ *
+ * @param {Request} request - Incoming request object
+ * @returns {Response} SSE stream response or 204 for unauthenticated users
+ */
+export async function GET(request: Request) {
+  const encoder = new TextEncoder();
+  const controller = new TransformStream();
+  const writer = controller.writable.getWriter();
+
+  try {
+    // Validate authentication
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token');
+
+    if (!token) {
+      // Return a 204 No Content instead of 401 for unauthenticated users
+      // This prevents aggressive reconnection attempts
+      return new Response(null, {
+        status: 204,
+        headers: {
+          'Cache-Control': 'no-cache, no-transform',
+          'Content-Type': 'text/event-stream',
+        },
+      });
+    }
+
+    // Decode and verify JWT token
+    let userId: string;
+    try {
+      const decoded = verify(token.value, process.env.JWT_SECRET!) as {
+        id: string;
+      };
+      userId = decoded.id;
+    } catch (error) {
+      // Invalid token, return 204 as well
+      return new Response(null, {
+        status: 204,
+        headers: {
+          'Cache-Control': 'no-cache, no-transform',
+          'Content-Type': 'text/event-stream',
+        },
+      });
+    }
+
+    // Create readable stream for SSE
+    const stream = new ReadableStream({
+      async start(controller) {
+        let isConnectionClosed = false;
+
+        // Handle client disconnection
+        request.signal.addEventListener('abort', () => {
+          isConnectionClosed = true;
+          controller.close();
+        });
+
+        // Keep connection alive with periodic pings and notification checks
+        const pingInterval = setInterval(async () => {
+          if (isConnectionClosed) {
+            clearInterval(pingInterval);
+            return;
+          }
+
+          try {
+            // Send ping to keep connection alive
+            controller.enqueue(encoder.encode(': ping\n\n'));
+
+            // Check for new notifications
+            const notifications = await prisma.notification.findMany({
+              where: {
+                userId,
+                status: 'UNREAD',
+              },
+              orderBy: {
+                createdAt: 'desc',
+              },
+            });
+
+            // Send notifications if any exist
+            if (notifications.length > 0) {
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ notifications })}\n\n`));
+            }
+          } catch (error) {
+            console.error('Error checking for notifications:', error);
+            if (!isConnectionClosed) {
+              controller.enqueue(
+                encoder.encode(
+                  `data: ${JSON.stringify({ error: 'Error checking notifications' })}\n\n`
+                )
+              );
+            }
+          }
+        }, 5000); // Check every 5 seconds
+
+        // Clean up interval on connection close
+        request.signal.addEventListener('abort', () => {
+          clearInterval(pingInterval);
+        });
+      },
+    });
+
+    // Return SSE stream response
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache, no-transform',
+        Connection: 'keep-alive',
+      },
+    });
+  } catch (error) {
+    console.error('SSE connection error:', error);
+    return new Response(null, {
+      status: 204,
+      headers: {
+        'Cache-Control': 'no-cache, no-transform',
+        'Content-Type': 'text/event-stream',
+      },
+    });
+  }
+}
+```
+
+###### ChatBox Component featuring Ably
+
+<a href="https://github.com/SpencerPresley/OVHL/blob/main/src/components/chatbox/chatbox-ably.tsx" target="_blank" rel="noopener noreferrer">View source →</a>
+
+```typescript
+/**
+ * @file chatbox-ably.tsx
+ * @author Spencer Presley
+ * @version 1.0.0
+ * @license Proprietary - Copyright (c) 2025 Spencer Presley
+ * @description Real-time chat implementation using Ably for WebSocket communication
+ * @module components/chatbox
+ * @requires ably
+ * @requires react
+ * @requires next
+ * @requires @giphy/js-types
+ * @requires date-fns
+ * @requires shadcn/ui
+ *
+ * Real-time Chat Component with Ably Integration
+ *
+ * A sophisticated real-time chat implementation using Ably for WebSocket communication.
+ * Features:
+ * - Real-time message delivery with optimistic updates
+ * - User presence tracking and online count
+ * - Message history persistence and loading
+ * - Rich media support (GIFs, emojis)
+ * - Responsive design with mobile optimization
+ * - Proper error handling and reconnection logic
+ *
+ * Technical Implementation:
+ * - Uses Ably's React hooks for real-time subscriptions
+ * - Implements connection pooling for efficiency
+ * - Maintains message ordering with timestamp-based sorting
+ * - Handles message deduplication
+ * - Implements proper cleanup on unmount
+ *
+ * Performance Optimizations:
+ * - Message batching for efficient updates
+ * - Lazy loading of GIF picker
+ * - Efficient message rendering with virtualization
+ * - Proper memo usage to prevent unnecessary rerenders
+ *
+ * @example
+ * // Basic usage
+ * <Chat
+ *   leagueId="nhl"
+ *   currentUser={{ id: "123", name: "John Doe" }}
+ * />
+ */
+
+'use client';
+
+import * as Ably from 'ably';
+import { AblyProvider, useChannel, ChannelProvider } from 'ably/react';
+import { useEffect, useState, useMemo } from 'react';
+import Link from 'next/link';
+import { IGif } from '@giphy/js-types';
+import type { SyntheticEvent } from 'react';
+import { formatDistanceToNow, format } from 'date-fns';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog';
+import { Card, CardContent } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Sticker, SendHorizontal } from 'lucide-react';
+import GifPicker from './gif-picker';
+
+/**
+ * Props for the Chat component
+ * @interface ChatProps
+ */
+export interface ChatProps {
+  /** ID of the league this chat belongs to */
+  leagueId: string;
+  /** Information about the currently authenticated user */
+  currentUser: {
+    /** User's unique identifier */
+    id: string;
+    /** User's display name */
+    name: string;
+  };
+}
+
+/**
+ * Structure of a chat message
+ * @interface ChatMessage
+ */
+interface ChatMessage {
+  /** The message text content */
+  text?: string;
+  /** The GIF object if this is a GIF message */
+  gif?: {
+    /** Unique identifier for the GIF */
+    id: string;
+    /** URL to the GIF image */
+    url: string;
+    /** Title/description of the GIF */
+    title: string;
+    /** Original width of the GIF */
+    width: number;
+    /** Original height of the GIF */
+    height: number;
+  };
+  /** The username of the message sender */
+  username: string;
+  /** The user ID of the message sender */
+  userId: string;
+  /** Timestamp when the message was sent */
+  timestamp: number;
+}
+
+/** Maximum number of messages to keep in the chat history */
+const MAX_MESSAGES = 100;
+
+/**
+ * Chat Component
+ *
+ * A real-time chat component that uses Ably for message delivery.
+ *
+ * State Management:
+ * - messages: Stores chat history and new messages
+ * - inputMessage: Manages the current input field state
+ * - onlineUsers: Tracks number of active users
+ * - isLoading: Controls loading state during history fetch
+ * - showGifPicker: Manages GIF picker visibility
+ *
+ * Real-time Features:
+ * - Message delivery with optimistic updates
+ * - Presence tracking with enter/leave events
+ * - Message history with proper ordering
+ * - Proper cleanup on unmount
+ *
+ * UI Components:
+ * - Chat container with gradient background
+ * - Message input with emoji support
+ * - GIF picker with mobile optimization
+ * - Online user counter
+ * - Message bubbles with timestamps
+ *
+ * @component
+ * @param {ChatProps} props - Component properties
+ */
+function ChatComponent({ leagueId, currentUser }: ChatProps) {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [inputMessage, setInputMessage] = useState('');
+  const [onlineUsers, setOnlineUsers] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showGifPicker, setShowGifPicker] = useState(false);
+  const isMobile = useIsMobile();
+
+  /**
+   * Message Handler
+   * Subscribes to channel messages and updates state with new messages.
+   * Maintains message order and handles pruning when limit is reached.
+   */
+  const { channel } = useChannel(`league-chat:${leagueId}`, (message) => {
+    if (message.name === 'message') {
+      setMessages((prev) => {
+        const newMessages = [...prev, message.data as ChatMessage];
+        return newMessages.slice(-MAX_MESSAGES);
+      });
+    }
+  });
+
+  /**
+   * Initialization Effect
+   * Sets up message history, presence tracking, and cleanup.
+   * Handles:
+   * - Loading historical messages
+   * - Setting up presence handlers
+   * - Managing connection lifecycle
+   */
+  useEffect(() => {
+    if (!channel) return;
+
+    // Load message history
+    const loadHistory = async () => {
+      try {
+        // Get messages in reverse order (oldest first) with a larger limit
+        const history = await channel.history({
+          limit: MAX_MESSAGES,
+          direction: 'forwards', // Get oldest messages first
+        });
+
+        const historicalMessages = history.items.map((item) => item.data as ChatMessage);
+
+        setMessages(historicalMessages);
+      } catch (error) {
+        console.error('Failed to load message history:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // Subscribe to presence updates
+    const onPresenceUpdate = () => {
+      channel.presence.get().then((members) => {
+        setOnlineUsers(members?.length || 0);
+      });
+    };
+
+    loadHistory();
+    onPresenceUpdate();
+
+    // Subscribe to presence events
+    channel.presence.subscribe(['enter', 'leave'], onPresenceUpdate);
+
+    // Enter the presence set
+    channel.presence.enter({ username: currentUser.name });
+
+    return () => {
+      channel.presence.unsubscribe();
+      channel.presence.leave();
+    };
+  }, [channel, currentUser]);
+
+  /**
+   * Message Sender
+   * Handles text message submission and publishing.
+   * Implements:
+   * - Input validation
+   * - Message formatting
+   * - Channel publishing
+   * - Input clearing
+   *
+   * @param {React.FormEvent} e - Form submission event
+   */
+  const sendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputMessage.trim()) return;
+
+    const message: ChatMessage = {
+      text: inputMessage,
+      username: currentUser.name,
+      userId: currentUser.id,
+      timestamp: Date.now(),
+    };
+
+    channel.publish('message', message);
+    setInputMessage('');
+  };
+
+  /**
+   * GIF Message Sender
+   * Handles GIF selection and publishing.
+   * Implements:
+   * - GIF data formatting
+   * - Channel publishing
+   * - UI state management
+   *
+   * @param {IGif} gif - Selected GIF data
+   * @param {SyntheticEvent} e - Selection event
+   */
+  const sendGif = (gif: IGif, e: SyntheticEvent<HTMLElement, Event>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const message: ChatMessage = {
+      gif: {
+        id: gif.id.toString(),
+        url: gif.images.original.url,
+        title: gif.title,
+        width: gif.images.original.width,
+        height: gif.images.original.height,
+      },
+      username: currentUser.name,
+      userId: currentUser.id,
+      timestamp: Date.now(),
+    };
+
+    channel.publish('message', message);
+    setShowGifPicker(false);
+  };
+
+  /**
+   * Time Formatter
+   * Formats message timestamps based on age.
+   * Returns:
+   * - Relative time for recent messages
+   * - Absolute time for older messages
+   *
+   * @param {number} timestamp - Message timestamp
+   * @returns {string} Formatted time string
+   */
+  const formatMessageTime = (timestamp: number) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const hoursDiff = Math.abs(now.getTime() - date.getTime()) / (1000 * 60 * 60);
+
+    if (hoursDiff < 24) {
+      return formatDistanceToNow(date, { addSuffix: true });
+    } else {
+      return format(date, 'MMM d, h:mm a');
+    }
+  };
+
+  return (
+    <Card className="flex flex-col h-[800px] lg:h-[600px] card-gradient shadow-xl">
+      <CardContent className="flex-1 p-0 overflow-hidden">
+        {/* Header Section
+         * Features:
+         * - Chat title
+         * - Online user counter with real-time updates
+         * - Responsive design with mobile optimization
+         */}
+        <div className="sticky top-0 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800 z-10">
+          <div className="flex items-center justify-between p-3">
+            <span className="text-sm font-medium text-gray-300">Shout Box</span>
+            <span className="text-xs bg-gray-800/80 px-2 py-1 rounded-full text-gray-300">
+              {onlineUsers} online
+            </span>
+          </div>
+
+          <form onSubmit={sendMessage} className="flex gap-2 p-3 border-t border-gray-800">
+            <Input
+              type="text"
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              placeholder="Type a message... 😊"
+              className="flex-1 bg-gray-800/80 text-white border-gray-700 focus:border-gray-600 transition-colors rounded-md"
+            />
+            {isMobile ? (
+              <Dialog open={showGifPicker} onOpenChange={setShowGifPicker}>
+                <DialogTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="icon"
+                    className="bg-gray-800/80 hover:bg-gray-700 border border-gray-700 hover:border-gray-600 transition-all rounded-md text-xs font-medium"
+                  >
+                    GIF
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="p-0 sm:max-w-[425px] border-gray-800 bg-gray-900 rounded-lg">
+                  <DialogTitle className="sr-only">GIF Picker</DialogTitle>
+                  <GifPicker onGifSelect={sendGif} onClose={() => setShowGifPicker(false)} />
+                </DialogContent>
+              </Dialog>
+            ) : (
+              <Popover open={showGifPicker} onOpenChange={setShowGifPicker}>
+                <PopoverTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="icon"
+                    className="bg-gray-800/80 hover:bg-gray-700 border border-gray-700 hover:border-gray-600 transition-all rounded-md text-xs font-medium"
+                  >
+                    GIF
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="p-0 w-auto border-gray-800 bg-gray-900 rounded-lg"
+                  align="end"
+                  side="bottom"
+                  sideOffset={5}
+                  alignOffset={0}
+                >
+                  <GifPicker onGifSelect={sendGif} onClose={() => setShowGifPicker(false)} />
+                </PopoverContent>
+              </Popover>
+            )}
+            <Button
+              type="submit"
+              variant="default"
+              size="icon"
+              className="bg-blue-600 hover:bg-blue-500 transition-colors rounded-md"
+            >
+              <SendHorizontal className="h-4 w-4" />
+            </Button>
+          </form>
+        </div>
+
+        {/* Messages Display Section
+         * Features:
+         * - Reverse chronological order
+         * - Smooth scrolling
+         * - Loading states
+         * - Empty state handling
+         * - Message grouping
+         */}
+        <ScrollArea className="flex-1 h-[calc(100%-90px)]">
+          <div className="p-3 min-h-full">
+            {isLoading ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+              </div>
+            ) : messages.length === 0 ? (
+              <div className="flex items-center justify-center h-full text-gray-400">
+                No messages yet. Be the first to chat! 👋
+              </div>
+            ) : (
+              <div className="flex flex-col-reverse space-y-reverse space-y-2">
+                {messages.map((msg, index) => (
+                  /**
+                   * Message Card Component
+                   *
+                   * Individual message display with:
+                   * - Username with profile link
+                   * - Timestamp with relative/absolute format
+                   * - Message content with text wrapping
+                   * - GIF display with optimized dimensions
+                   * - Hover effects and transitions
+                   */
+                  <Card
+                    key={index}
+                    className="group bg-gray-800/80 border-gray-700/50 hover:bg-gray-800/90 transition-colors rounded-md"
+                  >
+                    <CardContent className="p-3">
+                      {/* Message Header
+                       * Features:
+                       * - Username with profile link
+                       * - Timestamp with hover reveal
+                       * - Proper spacing and alignment
+                       */}
+                      <div className="flex justify-between items-start mb-1.5">
+                        <div>
+                          <Link
+                            href={`/users/${msg.userId}`}
+                            className="text-blue-400 font-medium hover:text-blue-300 transition-colors"
+                          >
+                            {msg.username}
+                          </Link>
+                          <span className="text-gray-500">: </span>
+                        </div>
+                        <span className="text-xs text-gray-500 opacity-60 group-hover:opacity-100 transition-opacity">
+                          {formatMessageTime(msg.timestamp)}
+                        </span>
+                      </div>
+
+                      {/* Message Content
+                       * Features:
+                       * - Text messages with proper wrapping
+                       * - GIF display with optimized dimensions
+                       * - Hover effects on media
+                       * - Proper spacing and padding
+                       */}
+                      {msg.text ? (
+                        <span className="text-gray-100 whitespace-pre-wrap break-words">
+                          {msg.text}
+                        </span>
+                      ) : msg.gif ? (
+                        <div className="mt-2 rounded-lg overflow-hidden">
+                          <img
+                            src={msg.gif.url}
+                            alt={msg.gif.title}
+                            className="max-w-full hover:scale-[1.02] transition-transform"
+                            style={{
+                              maxHeight: '200px',
+                              width: 'auto',
+                            }}
+                          />
+                        </div>
+                      ) : null}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+      </CardContent>
+    </Card>
+  );
+}
+
+/**
+ * Chat Provider Component
+ *
+ * Wraps the chat component with necessary providers for Ably integration.
+ * Creates and uses a memoized Ably client instance to enable:
+ * - Single persistent connection for all chats
+ * - Multiple simultaneous channel subscriptions
+ * - Efficient connection management
+ * - Cross-browser support
+ *
+ * Configuration:
+ * - Uses token auth for security
+ * - Enables message echoing for consistent display
+ * - Automatic cleanup on page unload
+ * - Channel-specific capabilities
+ *
+ * @component
+ * @param {ChatProps} props - Component properties
+ */
+const Chat = function Chat({ leagueId, currentUser }: ChatProps) {
+  console.log('Chat: Initializing for league', leagueId);
+
+  // Create a memoized client instance that persists across renders
+  const client = useMemo(() => {
+    console.log('Chat: Creating new Ably client');
+    return new Ably.Realtime({
+      authUrl: '/api/ably',
+      authMethod: 'GET',
+      echoMessages: true,
+      closeOnUnload: true,
+    });
+  }, []);
+
+  const channelName = `league-chat:${leagueId}`;
+  console.log('Chat: Using channel', channelName);
+
+  return (
+    <AblyProvider client={client}>
+      <ChannelProvider channelName={channelName}>
+        <ChatComponent leagueId={leagueId} currentUser={currentUser} />
+      </ChannelProvider>
+    </AblyProvider>
+  );
+};
+
+export default Chat;
+```
+
+###### Teams' Rosters Display Component
+
+<a href="https://github.com/SpencerPresley/OVHL/blob/main/src/app/leagues/%5Bid%5D/teams/teams-display.tsx" target="_blank" rel="noopener noreferrer">View source →</a>
+
+```typescript
+/**
+ * @file teams-display.tsx
+ * @author Spencer Presley
+ * @version 1.0.0
+ * @license Proprietary - Copyright (c) 2025 Spencer Presley
+ * @copyright All rights reserved. This code is the exclusive property of Spencer Presley.
+ * @notice Unauthorized copying, modification, distribution, or use is strictly prohibited.
+ *
+ * @description Comprehensive Team Roster and Performance Visualization Component
+ * @module components/teams-display
+ *
+ * @requires react
+ * @requires next/image
+ * @requires next/link
+ * @requires shadcn/ui
+ *
+ * Teams Display Component for League Management System
+ *
+ * Features:
+ * - Detailed team roster visualization
+ * - Position-based player organization
+ * - Performance statistics tracking
+ * - Responsive and interactive design
+ * - Dynamic team and player information display
+ *
+ * Technical Implementation:
+ * - Modular component architecture
+ * - Efficient data processing and filtering
+ * - Responsive layout with mobile optimization
+ * - Advanced state management
+ * - Performance-optimized rendering
+ *
+ * Design Principles:
+ * - Clean, intuitive user interface
+ * - Comprehensive data representation
+ * - Seamless user interaction
+ * - Accessibility-focused design
+ *
+ * Performance Considerations:
+ * - Memoization of complex calculations
+ * - Lazy loading of heavy components
+ * - Efficient re-rendering strategies
+ * - Minimal computational overhead
+ *
+ * @example
+ * // Basic usage in a league page
+ * <TeamsDisplay
+ *   league={leagueData}
+ *   teams={teamSeasonData}
+ * />
+ */
+
+'use client';
+
+import React from 'react';
+import { Nav } from '@/components/nav';
+import { LeagueNav } from '@/components/league-nav';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { System } from '@prisma/client';
+
+/**
+ * League information interface
+ */
+interface League {
+  id: string;
+  name: string;
+  logo: string;
+  bannerColor: string;
+}
+
+/**
+ * Player information interface including season stats and contract details
+ */
+interface Player {
+  playerSeason: {
+    player: {
+      id: string;
+      name: string;
+      gamertags: {
+        gamertag: string;
+        system: System;
+      }[];
+    };
+    position: string;
+    contract: {
+      amount: number;
+    } | null;
+  };
+  plusMinus: number;
+  goalsAgainst: number | null;
+  saves: number | null;
+}
+
+/**
+ * Team season information including roster and performance stats
+ */
+interface TeamSeason {
+  team: {
+    id: string;
+    officialName: string;
+    teamIdentifier: string;
+  };
+  wins: number;
+  losses: number;
+  otLosses: number;
+  players: Player[];
+}
+
+/**
+ * Props for the TeamsDisplay component
+ */
+interface TeamsDisplayProps {
+  league: League;
+  teams: TeamSeason[];
+}
+
+/**
+ * TeamsDisplay Component
+ *
+ * Renders a comprehensive view of all teams in a league, including rosters,
+ * player stats, and contract information. Features position-based organization
+ * and responsive navigation.
+ *
+ * @param {TeamsDisplayProps} props - Component props
+ * @returns {JSX.Element} Rendered component
+ */
+export function TeamsDisplay({ league, teams }: TeamsDisplayProps) {
+  // Sort teams alphabetically by name
+  const sortedTeams = [...teams].sort((a, b) =>
+    a.team.officialName.localeCompare(b.team.officialName)
+  );
+
+  const [isMobile, setIsMobile] = React.useState(false);
+  const [showBackToTop, setShowBackToTop] = React.useState(false);
+
+  // Mobile detection effect
+  React.useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Scroll position tracking for back-to-top button
+  React.useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 500);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  /**
+   * Filters and sorts players by position
+   * @param {Player[]} players - Array of players to filter
+   * @param {string[]} positions - Array of positions to filter by
+   * @returns {Player[]} Filtered and sorted players
+   */
+  const getPositionPlayers = (players: Player[], positions: string[]) => {
+    return players
+      .filter((p) => positions.includes(p.playerSeason.position))
+      .sort((a, b) => a.playerSeason.player.name.localeCompare(b.playerSeason.player.name));
+  };
+
+  /**
+   * Scrolls to a specific team's card
+   * @param {string} teamId - ID of the team to scroll to
+   */
+  const scrollToTeam = (teamId: string) => {
+    const element = document.getElementById(teamId);
+    if (element) {
+      const navHeight = 64; // Main nav height
+      const leagueNavHeight = 48; // League nav height
+      const teamNavHeight = 48; // Team nav height
+      const padding = isMobile ? 80 : -40; // More padding on mobile, negative on desktop
+      const totalOffset = navHeight + leagueNavHeight + teamNavHeight + padding;
+
+      const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+      window.scrollTo({
+        top: elementPosition - totalOffset,
+        behavior: 'smooth',
+      });
+    }
+  };
+
+  /**
+   * Scrolls back to the top of the page
+   */
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  return (
+    <div className="min-h-screen">
+      <Nav />
+
+      {/* League Banner Section
+       * Displays league logo, name, and title
+       * Uses league-specific banner color for branding
+       */}
+      <div className={`w-full ${league.bannerColor} py-8`}>
+        <div className="container mx-auto px-4 flex items-center justify-between">
+          <div className="flex items-center gap-8">
+            <Image
+              src={league.logo}
+              alt={`${league.name} Logo`}
+              width={80}
+              height={80}
+              className="object-contain"
+            />
+            <h1 className="text-4xl font-bold text-white">{league.name} Teams</h1>
+          </div>
+        </div>
+      </div>
+
+      <LeagueNav leagueId={league.id} />
+
+      {/* Team Navigation Bar
+       * Sticky navigation showing team abbreviations
+       * Allows quick jumping to specific teams
+       * Features glass-morphism design with blur effect
+       */}
+      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex flex-wrap gap-2">
+            {sortedTeams.map((team) => (
+              <button
+                key={team.team.id}
+                onClick={() => scrollToTeam(team.team.id)}
+                className="px-3 py-1.5 text-sm font-medium rounded-md bg-secondary hover:bg-secondary/80 hover:opacity-75 transition-all"
+              >
+                {team.team.teamIdentifier}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Teams Grid Section
+       * Main content area displaying team cards
+       * Features:
+       * - Responsive grid layout (1 column mobile, 2 columns tablet, 3 columns desktop)
+       * - Team cards with roster information
+       * - Contract values and performance statistics
+       */}
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+          {sortedTeams.map((teamSeason) => (
+            <Card
+              key={teamSeason.team.id}
+              id={teamSeason.team.id}
+              className="card-gradient card-hover overflow-hidden"
+            >
+              {/* Team Header Section
+               * Displays:
+               * - Team name with link
+               * - Total salary calculation
+               * - Win-loss-OT record
+               */}
+              <CardHeader className="border-b border-border">
+                <CardTitle className="flex flex-col">
+                  <Link
+                    href={`/leagues/${league.id}/teams/${teamSeason.team.teamIdentifier}`}
+                    className="text-2xl hover:opacity-75"
+                  >
+                    {teamSeason.team.officialName}
+                  </Link>
+                  <div className="flex justify-between items-center mt-2">
+                    <span className="text-sm text-gray-400">
+                      $
+                      {teamSeason.players
+                        .reduce(
+                          (total, player) =>
+                            total + (player.playerSeason.contract?.amount || 500000),
+                          0
+                        )
+                        .toLocaleString()}
+                    </span>
+                    <span className="text-lg font-mono bg-secondary/50 px-3 py-1 rounded-md">
+                      {teamSeason.wins}-{teamSeason.losses}-{teamSeason.otLosses}
+                    </span>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                {/* Forwards Section
+                 * Displays forward roster with position-specific organization
+                 * Features:
+                 * - Separate sections for LW, C, RW
+                 * - Player count with color-coded status
+                 * - Contract values and plus/minus statistics
+                 * - Links to player profiles
+                 */}
+                <div className="border-b border-border">
+                  <div className="p-4 bg-secondary/30">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-xl font-bold">Forwards</h3>
+                      {(() => {
+                        const forwardCount = getPositionPlayers(teamSeason.players, [
+                          'LW',
+                          'C',
+                          'RW',
+                        ]).length;
+                        let countColor = 'text-red-500';
+                        if (forwardCount >= 9) countColor = 'text-green-500';
+                        else if (forwardCount >= 6) countColor = 'text-yellow-500';
+                        return (
+                          <span className={`${countColor} font-medium`}>
+                            {forwardCount} players
+                          </span>
+                        );
+                      })()}
+                    </div>
+                  </div>
+                  <div className="p-4 space-y-4">
+                    {/* Left Wings */}
+                    <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-lg p-3 flex flex-col shadow-sm">
+                      <div className="flex justify-between items-center mb-3 pb-2 border-b border-border/50">
+                        <h4 className="font-semibold text-primary">Left Wing</h4>
+                        {(() => {
+                          const lwCount = getPositionPlayers(teamSeason.players, ['LW']).length;
+                          let countColor = 'text-red-500';
+                          if (lwCount >= 3) countColor = 'text-green-500';
+                          else if (lwCount === 2) countColor = 'text-yellow-500';
+                          return (
+                            <span className={`${countColor} text-sm font-medium`}>{lwCount}</span>
+                          );
+                        })()}
+                      </div>
+                      <div className="flex-1">
+                        {getPositionPlayers(teamSeason.players, ['LW']).map((player) => (
+                          <div
+                            key={player.playerSeason.player.id}
+                            className="mb-2 flex justify-between items-center last:mb-0"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Link
+                                href={`/users/${player.playerSeason.player.id}`}
+                                className="hover:text-blue-400"
+                              >
+                                {player.playerSeason.player.gamertags[0]?.gamertag ||
+                                  player.playerSeason.player.name}
+                              </Link>
+                              <span className="text-xs text-gray-400">
+                                ${(player.playerSeason.contract?.amount || 500000).toLocaleString()}
+                              </span>
+                            </div>
+                            <span
+                              className={`px-2 py-0.5 rounded text-sm min-w-[48px] text-center ${player.plusMinus >= 0 ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}
+                            >
+                              {player.plusMinus > 0 ? `+${player.plusMinus}` : player.plusMinus}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    {/* Centers */}
+                    <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-lg p-3 flex flex-col shadow-sm">
+                      <div className="flex justify-between items-center mb-3 pb-2 border-b border-border/50">
+                        <h4 className="font-semibold text-primary">Center</h4>
+                        {(() => {
+                          const cCount = getPositionPlayers(teamSeason.players, ['C']).length;
+                          let countColor = 'text-red-500';
+                          if (cCount >= 3) countColor = 'text-green-500';
+                          else if (cCount === 2) countColor = 'text-yellow-500';
+                          return (
+                            <span className={`${countColor} text-sm font-medium`}>{cCount}</span>
+                          );
+                        })()}
+                      </div>
+                      <div className="flex-1">
+                        {getPositionPlayers(teamSeason.players, ['C']).map((player) => (
+                          <div
+                            key={player.playerSeason.player.id}
+                            className="mb-2 flex justify-between items-center last:mb-0"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Link
+                                href={`/users/${player.playerSeason.player.id}`}
+                                className="hover:text-blue-400"
+                              >
+                                {player.playerSeason.player.gamertags[0]?.gamertag ||
+                                  player.playerSeason.player.name}
+                              </Link>
+                              <span className="text-xs text-gray-400">
+                                ${(player.playerSeason.contract?.amount || 500000).toLocaleString()}
+                              </span>
+                            </div>
+                            <span
+                              className={`px-2 py-0.5 rounded text-sm min-w-[48px] text-center ${player.plusMinus >= 0 ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}
+                            >
+                              {player.plusMinus > 0 ? `+${player.plusMinus}` : player.plusMinus}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    {/* Right Wings */}
+                    <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-lg p-3 flex flex-col shadow-sm">
+                      <div className="flex justify-between items-center mb-3 pb-2 border-b border-border/50">
+                        <h4 className="font-semibold text-primary">Right Wing</h4>
+                        {(() => {
+                          const rwCount = getPositionPlayers(teamSeason.players, ['RW']).length;
+                          let countColor = 'text-red-500';
+                          if (rwCount >= 3) countColor = 'text-green-500';
+                          else if (rwCount === 2) countColor = 'text-yellow-500';
+                          return (
+                            <span className={`${countColor} text-sm font-medium`}>{rwCount}</span>
+                          );
+                        })()}
+                      </div>
+                      <div className="flex-1">
+                        {getPositionPlayers(teamSeason.players, ['RW']).map((player) => (
+                          <div
+                            key={player.playerSeason.player.id}
+                            className="mb-2 flex justify-between items-center last:mb-0"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Link
+                                href={`/users/${player.playerSeason.player.id}`}
+                                className="hover:text-blue-400"
+                              >
+                                {player.playerSeason.player.gamertags[0]?.gamertag ||
+                                  player.playerSeason.player.name}
+                              </Link>
+                              <span className="text-xs text-gray-400">
+                                ${(player.playerSeason.contract?.amount || 500000).toLocaleString()}
+                              </span>
+                            </div>
+                            <span
+                              className={`px-2 py-0.5 rounded text-sm min-w-[48px] text-center ${player.plusMinus >= 0 ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}
+                            >
+                              {player.plusMinus > 0 ? `+${player.plusMinus}` : player.plusMinus}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Defense Section
+                 * Displays defensive roster organization
+                 * Features:
+                 * - Separate sections for LD, RD
+                 * - Player count with color-coded status
+                 * - Contract values and plus/minus statistics
+                 * - Links to player profiles
+                 */}
+                <div className="border-b border-border">
+                  <div className="p-4 bg-secondary/30">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-xl font-bold">Defense</h3>
+                      {(() => {
+                        const defenseCount = getPositionPlayers(teamSeason.players, [
+                          'LD',
+                          'RD',
+                        ]).length;
+                        let countColor = 'text-red-500';
+                        if (defenseCount >= 6) countColor = 'text-green-500';
+                        else if (defenseCount >= 4) countColor = 'text-yellow-500';
+                        return (
+                          <span className={`${countColor} font-medium`}>
+                            {defenseCount} players
+                          </span>
+                        );
+                      })()}
+                    </div>
+                  </div>
+                  <div className="p-4 space-y-4">
+                    {/* Left Defense */}
+                    <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-lg p-3 flex flex-col shadow-sm">
+                      <div className="flex justify-between items-center mb-3 pb-2 border-b border-border/50">
+                        <h4 className="font-semibold text-primary">Left Defense</h4>
+                        {(() => {
+                          const ldCount = getPositionPlayers(teamSeason.players, ['LD']).length;
+                          let countColor = 'text-yellow-500';
+                          if (ldCount >= 3) countColor = 'text-green-500';
+                          return (
+                            <span className={`${countColor} text-sm font-medium`}>{ldCount}</span>
+                          );
+                        })()}
+                      </div>
+                      <div className="flex-1">
+                        {getPositionPlayers(teamSeason.players, ['LD']).map((player) => (
+                          <div
+                            key={player.playerSeason.player.id}
+                            className="mb-2 flex justify-between items-center last:mb-0"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Link
+                                href={`/users/${player.playerSeason.player.id}`}
+                                className="hover:text-blue-400"
+                              >
+                                {player.playerSeason.player.gamertags[0]?.gamertag ||
+                                  player.playerSeason.player.name}
+                              </Link>
+                              <span className="text-xs text-gray-400">
+                                ${(player.playerSeason.contract?.amount || 500000).toLocaleString()}
+                              </span>
+                            </div>
+                            <span
+                              className={`px-2 py-0.5 rounded text-sm min-w-[48px] text-center ${player.plusMinus >= 0 ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}
+                            >
+                              {player.plusMinus > 0 ? `+${player.plusMinus}` : player.plusMinus}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    {/* Right Defense */}
+                    <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-lg p-3 flex flex-col shadow-sm">
+                      <div className="flex justify-between items-center mb-3 pb-2 border-b border-border/50">
+                        <h4 className="font-semibold text-primary">Right Defense</h4>
+                        {(() => {
+                          const rdCount = getPositionPlayers(teamSeason.players, ['RD']).length;
+                          let countColor = 'text-yellow-500';
+                          if (rdCount >= 3) countColor = 'text-green-500';
+                          return (
+                            <span className={`${countColor} text-sm font-medium`}>{rdCount}</span>
+                          );
+                        })()}
+                      </div>
+                      <div className="flex-1">
+                        {getPositionPlayers(teamSeason.players, ['RD']).map((player) => (
+                          <div
+                            key={player.playerSeason.player.id}
+                            className="mb-2 flex justify-between items-center last:mb-0"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Link
+                                href={`/users/${player.playerSeason.player.id}`}
+                                className="hover:text-blue-400"
+                              >
+                                {player.playerSeason.player.gamertags[0]?.gamertag ||
+                                  player.playerSeason.player.name}
+                              </Link>
+                              <span className="text-xs text-gray-400">
+                                ${(player.playerSeason.contract?.amount || 500000).toLocaleString()}
+                              </span>
+                            </div>
+                            <span
+                              className={`px-2 py-0.5 rounded text-sm min-w-[48px] text-center ${player.plusMinus >= 0 ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}
+                            >
+                              {player.plusMinus > 0 ? `+${player.plusMinus}` : player.plusMinus}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Goalies Section
+                 * Displays goalie roster and statistics
+                 * Features:
+                 * - Save percentage calculation and display
+                 * - Color-coded performance indicators
+                 * - Contract values
+                 * - Links to player profiles
+                 */}
+                <div>
+                  <div className="p-4 bg-secondary/30">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-xl font-bold">Goalies</h3>
+                      {(() => {
+                        const goalieCount = getPositionPlayers(teamSeason.players, ['G']).length;
+                        let countColor = 'text-red-500';
+                        if (goalieCount >= 2) countColor = 'text-green-500';
+                        else if (goalieCount === 1) countColor = 'text-yellow-500';
+                        return (
+                          <span className={`${countColor} font-medium`}>{goalieCount} players</span>
+                        );
+                      })()}
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-lg p-3 flex flex-col shadow-sm">
+                      <div className="flex justify-between items-center mb-3 pb-2 border-b border-border/50">
+                        <h4 className="font-semibold text-primary">Goalies</h4>
+                        {(() => {
+                          const gCount = getPositionPlayers(teamSeason.players, ['G']).length;
+                          let countColor = 'text-yellow-500';
+                          if (gCount >= 2) countColor = 'text-green-500';
+                          return (
+                            <span className={`${countColor} text-sm font-medium`}>{gCount}</span>
+                          );
+                        })()}
+                      </div>
+                      <div className="flex-1">
+                        {getPositionPlayers(teamSeason.players, ['G']).map((player) => {
+                          const saves = player.saves ?? 0;
+                          const goalsAgainst = player.goalsAgainst ?? 0;
+                          const totalShots = saves + goalsAgainst;
+                          const savePercentage = totalShots > 0 ? saves / totalShots : 0;
+
+                          let savePercentageColor = 'text-red-500 bg-red-500/20';
+                          if (savePercentage >= 0.8) {
+                            savePercentageColor = 'text-green-500 bg-green-500/20';
+                          } else if (savePercentage >= 0.7) {
+                            savePercentageColor = 'text-yellow-500 bg-yellow-500/20';
+                          }
+
+                          return (
+                            <div
+                              key={player.playerSeason.player.id}
+                              className="mb-2 flex justify-between items-center last:mb-0"
+                            >
+                              <div className="flex items-center gap-2">
+                                <Link
+                                  href={`/users/${player.playerSeason.player.id}`}
+                                  className="hover:text-blue-400"
+                                >
+                                  {player.playerSeason.player.gamertags[0]?.gamertag ||
+                                    player.playerSeason.player.name}
+                                </Link>
+                                <span className="text-xs text-gray-400">
+                                  $
+                                  {(
+                                    player.playerSeason.contract?.amount || 500000
+                                  ).toLocaleString()}
+                                </span>
+                              </div>
+                              <span
+                                className={`px-2 py-0.5 rounded text-sm ${savePercentageColor}`}
+                              >
+                                {totalShots === 0
+                                  ? '0.0%'
+                                  : `${(savePercentage * 100).toFixed(1)}%`}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* Back to Top Button
+       * Appears when scrolled past threshold
+       * Provides easy navigation back to top of page
+       * Features smooth scroll animation
+       */}
+      {showBackToTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-8 z-50 p-3 rounded-full bg-primary text-primary-foreground shadow-lg hover:opacity-90 transition-opacity"
+          aria-label="Back to top"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="m18 15-6-6-6 6" />
+          </svg>
+        </button>
+      )}
+    </div>
+  );
+}
+```
+
+###### Prisma Schema
+
+<a href="https://github.com/SpencerPresley/OVHL/blob/main/prisma/schema.prisma" target="_blank" rel="noopener noreferrer">View source →</a>
+
+```prisma
+// @file schema.prisma
+// @author Spencer Presley
+// @version 1.0.0
+// @license Proprietary - Copyright (c) 2025 Spencer Presley
+// @copyright All rights reserved. This code is the exclusive property of Spencer Presley.
+// @notice Unauthorized copying, modification, distribution, or use is strictly prohibited.
+// 
+// @description Comprehensive Database Schema for League Management System
+// @module prisma/schema
+// 
+// Database Schema Design Philosophy:
+// - Normalized data structure
+// - Flexible and extensible model relationships
+// - Support for multi-tier league management
+// - Comprehensive player and team tracking
+
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+// Prisma Client Generator Configuration
+// Responsible for generating type-safe database client with robust TypeScript type definitions
+generator client {
+  provider = "prisma-client-js"
+}
+
+// PostgreSQL Database Connection Configuration
+// Defines secure connection parameters for the application's primary database
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --------- Enums ---------
+// Enum representing gaming platforms/systems
+// Provides standardized tracking of player gaming environments
+enum System {
+  PS
+  XBOX
+}
+
+// --------- Authentication & Base User Models ---------
+// User model represents the core authentication and profile information
+// Serves as the primary identity management model for the application
+model User {
+  id                  String                  @id @default(cuid())
+  email               String                  @unique
+  username            String                  @unique
+  password            String
+  name                String?
+  isAdmin             Boolean                 @default(false) @map("is_admin")
+  resetToken          String?                 @unique
+  resetTokenExpiresAt DateTime?
+  createdAt           DateTime                @default(now())
+  updatedAt           DateTime                @updatedAt
+  player              Player?
+  notifications       Notification[]
+  forumPosts          ForumPost[]
+  forumComments       ForumComment[]
+  forumReactions      ForumReaction[]
+  forumFollowing      ForumFollower[]
+  forumSubscriptions  ForumPostSubscription[]
+
+  @@map("User")
+}
+
+// Player model extends user information with gaming-specific details
+// Tracks player profiles across different gaming platforms and seasons
+model Player {
+  id           String            @id // This IS the user's ID
+  ea_id        String            @map("ea_id")
+  name         String
+  activeSystem System            @map("active_system")
+  createdAt    DateTime          @default(now()) @map("created_at")
+  updatedAt    DateTime          @updatedAt @map("updated_at")
+  user         User              @relation(fields: [id], references: [id])
+  gamertags    GamertagHistory[]
+  seasons      PlayerSeason[]
+}
+
+// GamertagHistory tracks player's gaming identities across different systems
+// Enables historical tracking of player gamertags and platform transitions
+model GamertagHistory {
+  playerId  String   @map("player_id")
+  system    System
+  gamertag  String
+  createdAt DateTime @default(now()) @map("created_at")
+  player    Player   @relation(fields: [playerId], references: [id])
+
+  @@id([playerId, system])
+}
+
+// --------- Season & League Structure ---------
+// Season model represents a specific competitive period
+// Supports tracking of multi-tier league seasons and player participation
+model Season {
+  id        String         @id @default(uuid())
+  seasonId  String         @map("season_id")
+  isLatest  Boolean        @default(false) @map("is_latest")
+  createdAt DateTime       @default(now()) @map("created_at")
+  updatedAt DateTime       @updatedAt @map("updated_at")
+  tiers     Tier[]
+  players   PlayerSeason[]
+}
+
+// Tier model represents different competitive levels within a season
+// Enables hierarchical league structure (e.g., NHL, AHL, CHL)
+model Tier {
+  id            String              @id @default(uuid())
+  seasonId      String              @map("season_id")
+  leagueLevel   Int                 @map("league_level")
+  name          String // Add this to store NHL, AHL, CHL, etc.
+  createdAt     DateTime            @default(now()) @map("created_at")
+  updatedAt     DateTime            @updatedAt @map("updated_at")
+  season        Season              @relation(fields: [seasonId], references: [id])
+  teams         TeamSeason[]
+  playerHistory PlayerTierHistory[]
+}
+
+// --------- Team Structure ---------
+// Team model represents a sports team with comprehensive tracking capabilities
+// Supports team affiliations, historical data, and cross-league relationships
+model Team {
+  id             String       @id @default(uuid())
+  eaClubId       String       @map("ea_club_id")
+  eaClubName     String       @map("ea_club_name")
+  officialName   String       @map("official_name")
+  teamIdentifier String       @unique @map("team_identifier") @db.VarChar(14)
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+  seasons        TeamSeason[]
+
+  // Affiliation relationships
+  nhlAffiliateId String? @map("nhl_affiliate_id")
+  ahlAffiliateId String? @map("ahl_affiliate_id")
+  nhlAffiliate   Team?   @relation("NHLAffiliation", fields: [nhlAffiliateId], references: [id])
+  ahlAffiliate   Team?   @relation("AHLAffiliation", fields: [ahlAffiliateId], references: [id])
+
+  // Reverse relationships
+  ahlAffiliates  Team[] @relation("NHLAffiliation")
+  echlAffiliates Team[] @relation("AHLAffiliation")
+
+  @@index([nhlAffiliateId])
+  @@index([ahlAffiliateId])
+}
+
+// TeamSeason model captures a team's performance and statistics for a specific season
+// Provides granular tracking of team performance metrics
+model TeamSeason {
+  id                       String @id @default(uuid())
+  teamId                   String @map("team_id")
+  tierId                   String @map("tier_id")
+  wins                     Int    @default(0)
+  losses                   Int    @default(0)
+  otLosses                 Int    @default(0)
+  goalsAgainst             Int    @default(0) @map("goals_against")
+  goalsFor                 Int    @default(0) @map("goals_for")
+  matchesPlayed            Int    @default(0) @map("matches_played")
+  penaltyKillGoalsAgainst  Int    @default(0) @map("penalty_kill_goals_against")
+  penaltyKillOpportunities Int    @default(0) @map("penalty_kill_opportunities")
+  powerplayGoals           Int    @default(0) @map("powerplay_goals")
+  powerplayOpportunities   Int    @default(0) @map("powerplay_opportunities")
+  shots                    Int    @default(0)
+  shotsAgainst             Int    @default(0) @map("shots_against")
+  timeOnAttack             Int    @default(0) @map("time_on_attack")
+
+  createdAt DateTime           @default(now()) @map("created_at")
+  updatedAt DateTime           @updatedAt @map("updated_at")
+  team      Team               @relation(fields: [teamId], references: [id])
+  tier      Tier               @relation(fields: [tierId], references: [id])
+  matches   Match[]
+  players   PlayerTeamSeason[]
+}
+
+// --------- Player Season & Stats ---------
+model PlayerSeason {
+  id             String              @id @default(uuid())
+  playerId       String              @map("player_id")
+  seasonId       String              @map("season_id")
+  position       String
+  gamesPlayed    Int?                @map("games_played")
+  goals          Int?
+  assists        Int?
+  plusMinus      Int?                @map("plus_minus")
+  shots          Int?
+  hits           Int?
+  takeaways      Int?
+  giveaways      Int?
+  penaltyMinutes Int?                @map("penalty_minutes")
+  saves          Int?
+  goalsAgainst   Int?                @map("goals_against")
+  createdAt      DateTime            @default(now()) @map("created_at")
+  updatedAt      DateTime            @updatedAt @map("updated_at")
+  player         Player              @relation(fields: [playerId], references: [id])
+  season         Season              @relation(fields: [seasonId], references: [id])
+  teamSeasons    PlayerTeamSeason[]
+  tierHistory    PlayerTierHistory[]
+  contract       Contract? // One-to-one relation with Contract
+
+  @@map("player_seasons")
+}
+
+model PlayerTierHistory {
+  id             String       @id @default(uuid())
+  playerSeasonId String       @map("player_season_id")
+  tierId         String       @map("tier_id")
+  startDate      DateTime     @default(now()) @map("start_date")
+  endDate        DateTime?    @map("end_date")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+  playerSeason   PlayerSeason @relation(fields: [playerSeasonId], references: [id])
+  tier           Tier         @relation(fields: [tierId], references: [id])
+}
+
+model PlayerTeamSeason {
+  id             String        @id @default(uuid())
+  playerSeasonId String        @map("player_season_id")
+  teamSeasonId   String        @map("team_season_id")
+  // Stats for this specific team
+  assists        Int           @default(0)
+  gamesPlayed    Int           @default(0) @map("games_played")
+  giveaways      Int           @default(0)
+  goals          Int           @default(0)
+  hits           Int           @default(0)
+  penaltyMinutes Int           @default(0) @map("penalty_minutes")
+  plusMinus      Int           @default(0) @map("plus_minus")
+  shots          Int           @default(0)
+  takeaways      Int           @default(0)
+  saves          Int?
+  goalsAgainst   Int?          @map("goals_against")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+  playerSeason   PlayerSeason  @relation(fields: [playerSeasonId], references: [id])
+  teamSeason     TeamSeason    @relation(fields: [teamSeasonId], references: [id])
+  matches        PlayerMatch[]
+
+  @@map("player_team_seasons")
+}
+
+// New models for contracts and bidding
+model Contract {
+  id             String       @id @default(uuid())
+  playerSeason   PlayerSeason @relation(fields: [playerSeasonId], references: [id])
+  playerSeasonId String       @unique @map("player_season_id")
+  amount         Int // Contract amount in dollars
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+  bids           Bid[] // One-to-many relation with Bid
+
+  @@map("contracts")
+}
+
+model Bid {
+  id         String    @id @default(uuid())
+  contract   Contract  @relation(fields: [contractId], references: [id])
+  contractId String    @map("contract_id")
+  teamId     String    @map("team_id") // ID of the team making the bid
+  amount     Int // Bid amount in dollars
+  status     BidStatus @default(PENDING)
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  @@map("bids")
+}
+
+enum BidStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+// --------- Match Stats ---------
+model Match {
+  id                       String        @id @default(uuid())
+  teamSeasonId             String        @map("team_season_id")
+  eaMatchId                String        @map("ea_match_id")
+  goalsAgainst             Int           @map("goals_against")
+  goalsFor                 Int           @map("goals_for")
+  opponentClubId           String        @map("opponent_club_id")
+  opponentTeamId           String        @map("opponent_team_id")
+  penaltyKillGoalsAgainst  Int           @map("penalty_kill_goals_against")
+  penaltyKillOpportunities Int           @map("penalty_kill_opportunities")
+  powerplayGoals           Int           @map("powerplay_goals")
+  powerplayOpportunities   Int           @map("powerplay_opportunities")
+  shots                    Int
+  shotsAgainst             Int           @map("shots_against")
+  timeOnAttack             Int           @map("time_on_attack")
+  createdAt                DateTime      @default(now()) @map("created_at")
+  updatedAt                DateTime      @updatedAt @map("updated_at")
+  teamSeason               TeamSeason    @relation(fields: [teamSeasonId], references: [id])
+  playerStats              PlayerMatch[]
+}
+
+model PlayerMatch {
+  id                 String           @id @default(uuid())
+  matchId            String           @map("match_id")
+  playerTeamSeasonId String           @map("player_team_season_id")
+  assists            Int
+  giveaways          Int
+  goals              Int
+  hits               Int
+  penaltyMinutes     Int              @map("penalty_minutes")
+  plusMinus          Int              @map("plus_minus")
+  ratingDefense      Float            @map("rating_defense")
+  ratingOffense      Float            @map("rating_offense")
+  ratingTeamplay     Float            @map("rating_teamplay")
+  shots              Int
+  takeaways          Int
+  timeOnIce          Int              @map("time_on_ice")
+  createdAt          DateTime         @default(now()) @map("created_at")
+  updatedAt          DateTime         @updatedAt @map("updated_at")
+  match              Match            @relation(fields: [matchId], references: [id])
+  playerTeamSeason   PlayerTeamSeason @relation(fields: [playerTeamSeasonId], references: [id])
+}
+
+// --------- Notification System ---------
+enum NotificationType {
+  SYSTEM
+  FORUM
+  TEAM
+  LEAGUE
+  MATCH
+  CUSTOM
+}
+
+enum NotificationStatus {
+  UNREAD
+  READ
+  ARCHIVED
+}
+
+model Notification {
+  id        String             @id @default(cuid())
+  userId    String             @map("user_id")
+  type      NotificationType
+  title     String
+  message   String
+  status    NotificationStatus @default(UNREAD)
+  link      String? // Optional link to related content
+  metadata  Json? // Flexible metadata for different notification types
+  createdAt DateTime           @default(now()) @map("created_at")
+  updatedAt DateTime           @updatedAt @map("updated_at")
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([type])
+}
+
+// --------- Forum System ---------
+enum ForumPostStatus {
+  PUBLISHED
+  HIDDEN
+  DELETED
+}
+
+enum ReactionType {
+  LIKE
+  DISLIKE
+  LAUGH
+  THINKING
+  HEART
+}
+
+model ForumPost {
+  id          String                  @id @default(cuid())
+  title       String
+  content     String
+  status      ForumPostStatus         @default(PUBLISHED)
+  authorId    String                  @map("author_id")
+  leagueId    String                  @map("league_id")
+  createdAt   DateTime                @default(now()) @map("created_at")
+  updatedAt   DateTime                @updatedAt @map("updated_at")
+  author      User                    @relation(fields: [authorId], references: [id])
+  comments    ForumComment[]
+  reactions   ForumReaction[]
+  followers   ForumFollower[]
+  subscribers ForumPostSubscription[]
+  gif         Json? // { id: string, url: string, title: string, width: string, height: string }
+
+  @@index([authorId])
+  @@index([leagueId])
+  @@index([status])
+  @@map("forum_posts")
+}
+
+model ForumReaction {
+  id        String        @id @default(cuid())
+  type      ReactionType
+  userId    String        @map("user_id")
+  postId    String?       @map("post_id")
+  commentId String?       @map("comment_id")
+  createdAt DateTime      @default(now()) @map("created_at")
+  user      User          @relation(fields: [userId], references: [id])
+  post      ForumPost?    @relation(fields: [postId], references: [id])
+  comment   ForumComment? @relation("QuotedComment", fields: [quotedCommentId], references: [id])
+
+  @@unique([userId, postId, commentId, type])
+  @@index([userId])
+  @@index([postId])
+  @@index([commentId])
+  @@map("forum_reactions")
+}
+
+model ForumFollower {
+  id        String    @id @default(cuid())
+  userId    String    @map("user_id")
+  postId    String    @map("post_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+  user      User      @relation(fields: [userId], references: [id])
+  post      ForumPost @relation(fields: [postId], references: [id])
+
+  @@unique([userId, postId])
+  @@index([userId])
+  @@index([postId])
+  @@map("forum_followers")
+}
+
+model ForumPostSubscription {
+  id        String    @id @default(cuid())
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String
+  post      ForumPost @relation(fields: [postId], references: [id])
+  postId    String
+  createdAt DateTime  @default(now())
+
+  @@unique([userId, postId])
+  @@index([userId])
+  @@index([postId])
+  @@map("forum_post_subscriptions")
+}
+
+model ForumComment {
+  id              String          @id @default(cuid())
+  content         String
+  status          ForumPostStatus @default(PUBLISHED)
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  author          User            @relation(fields: [authorId], references: [id])
+  authorId        String          @map("author_id")
+  post            ForumPost       @relation(fields: [postId], references: [id])
+  postId          String          @map("post_id")
+  quotedComment   ForumComment?   @relation("QuotedComment", fields: [quotedCommentId], references: [id])
+  quotedCommentId String?         @map("quoted_comment_id")
+  quotedBy        ForumComment[]  @relation("QuotedComment")
+  reactions       ForumReaction[]
+  gif             Json? // { id: string, url: string, title: string, width: string, height: string }
+
+  @@index([authorId])
+  @@index([postId])
+  @@map("forum_comments")
+}
+```
+
+
+

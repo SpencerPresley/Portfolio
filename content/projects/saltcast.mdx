@@ -1,0 +1,60 @@
+---
+title: "SaltCast"
+description: A sophisticated AI chatbot system that combines vector database technology with LLM capabilities to provide intelligent responses about Chesapeake Bay salinity research. Features real-time streaming, conversation memory management, and semantic search capabilities.
+repository: Pham-Vincent/Equitable-Water-Solutions/tree/main/chatbot
+date: "2024-12-16"
+url: https://saltcast.io/
+published: true
+status: "legacy"
+category: "internship"
+
+---
+
+![SaltCast](/saltcastPortfolio.png)
+
+SaltCast is a larger project funded by the National Science Foundation (NSF) that I had a pleasure to work on.
+
+My part consisted of building an advanced AI Chatbot designed to provide intelligent insights about salinity research in the Chesapeake Bay and answer questions about the project. The system combines **vector database technology** with **LLM capabilities**, better known as **RAG**, to deliver accurate, context-aware responses in real-time.
+
+The knowledge the Chatbot was given was a combination of information about SaltCast team members, research papers, salinity data, client interviews, and more.
+
+I went above the normal boiler plate **RAG** implementation by using non-default **indexes** such as **Hierarchical Navigable Small World graph exploration (HNSW)** and intelligent caching to deliver **extremely low response latency** while also delivering better, more accurate responses even with less context.
+
+## Technical Overview
+
+### Vector Database System
+
+- Custom **vector database builder** with **FAISS** integration
+- **HNSW** and **Flat2** index support
+- Metadata-aware document storage
+- **Semantic search** with relevance scoring and filtering
+
+### Chatbot Architecture
+
+- Real-time response streaming
+- Conversation summary buffer and entity memory management
+- Session management
+- Dynamic context retrieval featuring **RAG**
+- Comprehensive **error handling**
+
+### Frontend Integration
+
+- Modern **JavaScript** interface
+- Server-Sent Events (**SSE**) integration
+- Real-time Chat Updates
+- Dynamic UI **State Management**
+- Responsive design
+
+## Additional Features
+
+- OpenAI integration with configurable models and parameters
+- Flask route management
+- Structured data processing
+
+## In-Depth Technical Summary
+
+The system's core consists of two main components: a sophisticated vector database manager and an intelligent chatbot engine. The vector database system features custom implementations for handling research articles and team information, with support for both HNSW and FlatL2 indices for optimal similarity search performance.
+
+The chatbot engine includes a sophisticated memory management system that maintains conversation context while optimizing token usage. The system streams responses in real-time using Server-Sent Events, providing immediate feedback while managing long-running LLM operations.
+
+The project showcases expertise in AI system design, real-time web applications, and sophisticated data management, demonstrating both technical proficiency and practical application in environmental research.

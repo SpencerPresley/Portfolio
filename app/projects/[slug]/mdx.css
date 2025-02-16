@@ -1,32 +1,109 @@
+.prose pre {
+  @apply bg-zinc-900 rounded-lg overflow-x-auto max-w-full my-4;
+  width: 100%;
+}
+
+.prose pre code {
+  @apply bg-transparent p-0 text-sm text-zinc-100;
+  border: none;
+  font-family: 'Fira Code', monospace;
+}
+
+[data-rehype-pretty-code-fragment] {
+  @apply overflow-x-auto w-full my-4;
+}
+
 [data-rehype-pretty-code-fragment] code {
-    @apply grid min-w-full break-words rounded-none border-0 bg-transparent p-0 text-sm text-black;
-    counter-reset: line;
-    box-decoration-break: clone;
-  }
-  [data-rehype-pretty-code-fragment] .line {
-    @apply px-4 py-1;
-  }
-  [data-rehype-pretty-code-fragment] [data-line-numbers] > .line::before {
-    counter-increment: line;
-    content: counter(line);
-    display: inline-block;
-    width: 1rem;
-    margin-right: 1rem;
-    text-align: right;
-    color: gray;
-  }
-  [data-rehype-pretty-code-fragment] .line--highlighted {
-    @apply bg-zinc-300 bg-opacity-10;
-  }
-  [data-rehype-pretty-code-fragment] .line-highlighted span {
-    @apply relative;
-  }
-  [data-rehype-pretty-code-fragment] .word--highlighted {
-    @apply rounded-md bg-zinc-300 bg-opacity-10 p-1;
-  }
-  [data-rehype-pretty-code-title] {
-    @apply mt-4 py-2 px-4 text-sm font-medium;
-  }
-  [data-rehype-pretty-code-title] + pre {
-    @apply mt-0;
-  }
+  @apply grid min-w-full break-words rounded-none border-0 bg-transparent p-0 text-sm text-black;
+  counter-reset: line;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+[data-rehype-pretty-code-fragment] .line {
+  @apply px-4 py-1;
+}
+
+[data-rehype-pretty-code-fragment] [data-line-numbers] > .line::before {
+  counter-increment: line;
+  content: counter(line);
+  display: inline-block;
+  width: 1rem;
+  margin-right: 1rem;
+  text-align: right;
+  color: gray;
+}
+
+[data-rehype-pretty-code-fragment] .line--highlighted {
+  @apply bg-zinc-300 bg-opacity-10;
+}
+
+[data-rehype-pretty-code-fragment] .line-highlighted span {
+  @apply relative;
+}
+
+[data-rehype-pretty-code-fragment] .word--highlighted {
+  @apply rounded-md bg-zinc-300 bg-opacity-10 p-1;
+}
+
+/* Syntax highlighting colors */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  @apply text-zinc-500;
+}
+
+.token.punctuation {
+  @apply text-zinc-400;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol {
+  @apply text-blue-400;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin {
+  @apply text-green-400;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  @apply text-yellow-400;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  @apply text-purple-400;
+}
+
+.token.function,
+.token.class-name {
+  @apply text-pink-400;
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  @apply text-orange-400;
+}
+
+[data-rehype-pretty-code-title] {
+  @apply mt-4 py-2 px-4 text-sm font-medium;
+}
+
+[data-rehype-pretty-code-title] + pre {
+  @apply mt-0;
+}
