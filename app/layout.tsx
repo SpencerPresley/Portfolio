@@ -2,7 +2,8 @@ import "../global.css";
 import { Inter } from "next/font/google";
 import LocalFont from "next/font/local";
 import { Metadata } from "next";
-import { Analytics } from "./components/analytics";
+import { Analytics as VercelAnalytics } from '@vercel/analytics/next';
+import { Analytics as BeamAnalytics } from "./components/beam_analytics";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://spencerpresley.com"),
@@ -63,13 +64,14 @@ export default function RootLayout({
   return (
     <html lang="en" className={[inter.variable, calSans.variable].join(" ")}>
       <head>
-        <Analytics />
+        <BeamAnalytics />
       </head>
       <body
         className={`bg-black ${process.env.NODE_ENV === "development" ? "debug-screens" : undefined
           }`}
       >
         {children}
+        <VercelAnalytics />
       </body>
     </html>
   );
