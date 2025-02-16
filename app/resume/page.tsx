@@ -2,6 +2,7 @@
 
 import { Download } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Navigation } from "../components/nav";
 
 export default function Resume() {
   const [isMobile, setIsMobile] = useState(false);
@@ -15,6 +16,7 @@ export default function Resume() {
 
   return (
     <div className="relative min-h-screen bg-gradient-to-tl from-zinc-900 via-zinc-400/10 to-zinc-900">
+      <Navigation />
       <div className="container mx-auto px-4 py-12">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-bold text-zinc-100">Resume</h1>
