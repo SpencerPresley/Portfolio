@@ -21,7 +21,7 @@ export default function Resume() {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-bold text-zinc-100">Resume</h1>
           <a 
-            href="/ResumeLatest.pdf" 
+            href="/RESUME_SpencerPresley.pdf" 
             download
             className="flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 transition-colors rounded-lg text-zinc-100"
           >
@@ -34,7 +34,7 @@ export default function Resume() {
           <div className="flex flex-col items-center justify-center mt-4">
             <p className="text-zinc-400 text-sm mb-4">For the best experience, download the PDF version</p>
             <a 
-              href="/ResumeLatest.pdf" 
+              href="/RESUME_SpencerPresley.pdf" 
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-400 hover:text-blue-300 transition-colors"
@@ -45,7 +45,7 @@ export default function Resume() {
         ) : (
           <div className="w-full aspect-[8.5/11] bg-zinc-800 rounded-lg overflow-hidden">
             <iframe
-              src="/ResumeLatest.pdf"
+              src="/RESUME_SpencerPresley.pdf"
               className="w-full h-full border-none"
               title="Spencer Presley's Resume"
             />
