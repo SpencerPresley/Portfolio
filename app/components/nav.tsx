@@ -8,6 +8,7 @@ export const Navigation: React.FC = () => {
 	const ref = useRef<HTMLElement>(null);
 	const [isIntersecting, setIntersecting] = useState(true);
 	const pathname = usePathname();
+	const isHome = pathname === "/";
 	const isResume = pathname?.startsWith("/resume") ?? false;
 	const isProjects = pathname?.startsWith("/projects") ?? false;
 
@@ -64,13 +65,19 @@ export const Navigation: React.FC = () => {
 						</Link>
 					</nav>
 
-					<Link
-						href="/"
-						aria-label="Home"
-						className="duration-200 text-zinc-300 hover:text-zinc-100"
-					>
-						<ArrowLeft className="w-6 h-6 " />
-					</Link>
+					{isHome ? (
+						<span className="font-display text-lg text-zinc-100">
+							Spencer Presley
+						</span>
+					) : (
+						<Link
+							href="/"
+							aria-label="Home"
+							className="duration-200 text-zinc-300 hover:text-zinc-100"
+						>
+							<ArrowLeft className="h-6 w-6" aria-hidden="true" />
+						</Link>
+					)}
 				</div>
 			</div>
 		</header>
