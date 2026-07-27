@@ -3,25 +3,22 @@ import { Github, Mail, Linkedin } from "lucide-react";
 import Link from "next/link";
 import { Navigation } from "../components/nav";
 import { Card } from "../components/card";
+import { siteContact } from "../site-data";
 
 const socials = [
 	{
 		icon: <Mail size={20} />,
-		href: "mailto:spencer@spencerpresley.com",
+		href: `mailto:${siteContact.email}`,
 		label: "Email",
-		handle: "spencer@spencerpresley.com",
+		handle: siteContact.email,
 	},
 	{
 		icon: <Github size={20} />,
-		href: "https://github.com/SpencerPresley",
-		label: "Github",
-		handle: "SpencerPresley",
+		...siteContact.github,
 	},
 	{
 		icon: <Linkedin size={20} />,
-		href: "https://www.linkedin.com/in/spencerpresley96/",
-		label: "LinkedIn",
-		handle: "Spencer Presley",
+		...siteContact.linkedin,
 	},
 ];
 

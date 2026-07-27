@@ -7,10 +7,10 @@ import {
   Mail,
 } from "lucide-react";
 import { Navigation } from "../components/nav";
+import { siteContact } from "../site-data";
 import {
   type ResumeBullet,
   type ResumeFocus,
-  resumeContact,
   resumeEducation,
   resumeFocuses,
   resumeVariants,
@@ -269,19 +269,19 @@ export function ResumeView({
               <ul className="mt-5 space-y-3 text-sm">
                 <li>
                   <a
-                    href={`mailto:${resumeContact.email}`}
+                    href={`mailto:${siteContact.email}`}
                     className="group flex items-center gap-3 text-zinc-300 transition hover:text-white"
                   >
                     <Mail
                       className="h-4 w-4 text-zinc-600 transition group-hover:text-sky-300"
                       aria-hidden="true"
                     />
-                    <span className="break-all">{resumeContact.email}</span>
+                    <span className="break-all">{siteContact.email}</span>
                   </a>
                 </li>
                 <li>
                   <a
-                    href={resumeContact.linkedin}
+                    href={siteContact.linkedin.href}
                     target="_blank"
                     rel="noreferrer"
                     className="group flex items-center gap-3 text-zinc-300 transition hover:text-white"
@@ -295,7 +295,7 @@ export function ResumeView({
                 </li>
                 <li>
                   <a
-                    href={resumeContact.github}
+                    href={siteContact.github.href}
                     target="_blank"
                     rel="noreferrer"
                     className="group flex items-center gap-3 text-zinc-300 transition hover:text-white"

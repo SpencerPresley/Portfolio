@@ -37,12 +37,6 @@ export type ResumeVariant = {
   skills: ResumeSkillGroup[];
 };
 
-export const resumeContact = {
-  email: "spencerpresley96@gmail.com",
-  linkedin: "https://www.linkedin.com/in/spencerpresley96",
-  github: "https://github.com/SpencerPresley",
-};
-
 export const resumeEducation = {
   institution: "Salisbury University",
   degree: "B.S. Computer Science, Minor in Mathematics",
