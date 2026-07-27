@@ -9,6 +9,7 @@ export const Navigation: React.FC = () => {
 	const [isIntersecting, setIntersecting] = useState(true);
 	const pathname = usePathname();
 	const isResume = pathname?.startsWith("/resume") ?? false;
+	const isProjects = pathname?.startsWith("/projects") ?? false;
 
 	useEffect(() => {
 		if (!ref.current) return;
@@ -30,12 +31,15 @@ export const Navigation: React.FC = () => {
 				}`}
 			>
 				<div className="container flex flex-row-reverse items-center justify-between px-6 py-5 mx-auto">
-					<nav aria-label="Primary" className="flex justify-between gap-5 sm:gap-8">
+					<nav
+						aria-label="Primary"
+						className="flex justify-between gap-5 sm:gap-8"
+					>
 						<Link
 							href="/projects"
-							aria-current={pathname === "/projects" ? "page" : undefined}
+							aria-current={isProjects ? "page" : undefined}
 							className={`duration-200 hover:text-zinc-100 ${
-								pathname === "/projects" ? "text-zinc-100" : "text-zinc-400"
+								isProjects ? "text-zinc-100" : "text-zinc-400"
 							}`}
 						>
 							Projects

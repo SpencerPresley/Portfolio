@@ -36,3 +36,10 @@ cp ~/resume/versions/variants/presley_ai-llm-v2.pdf public/RESUME_SpencerPresley
 
 The last copy preserves the original public URL for old links while making the
 AI/LLM resume the default download.
+
+## Updating projects
+
+Project metadata and case-study content live in
+`app/projects/project-data.ts`. Each typed record drives both the project index
+and its `/projects/[slug]` detail route; there is no database, CMS, Markdown, or
+generated content layer.

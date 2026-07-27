@@ -4,8 +4,6 @@ const defaultTheme = require("tailwindcss/defaultTheme");
 module.exports = {
 	content: [
 		"./app/**/*.{js,ts,jsx,tsx}",
-		"./mdx-components.tsx",
-		"content/**/*.mdx",
 	],
 
 	theme: {
@@ -104,8 +102,5 @@ module.exports = {
 			},
 		},
 	},
-	plugins: [
-		require("@tailwindcss/typography"),
-		require("tailwindcss-debug-screens"),
-	],
+	plugins: [require("tailwindcss-debug-screens")],
 };
