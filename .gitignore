@@ -37,6 +37,9 @@ next-env.d.ts
 
 .contentlayer
 
+# Local git worktrees
+/.worktrees/
+
 .env
 .env.local
 .env.example
