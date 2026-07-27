@@ -40,6 +40,7 @@ public case studies.
 - Lead with current professional work, then show the two strongest inspectable
   technical projects.
 - Bring Contact into the Projects/Resume visual system.
+- Give the top-level pages subtle visual variety and a coherent color handoff.
 - Make `spencerpresley96@gmail.com` the canonical email everywhere.
 - Eliminate unnecessary client-side animation and duplicated contact data.
 
@@ -50,6 +51,30 @@ public case studies.
 - Add unsupported professional claims or expose more private CrunchAtlas work.
 - Turn the homepage into a second complete projects index.
 - Preserve the particle effect merely for continuity with the previous design.
+- Override the project-specific accent on project-detail pages.
+
+## Top-level Atmosphere System
+
+The primary route order is Home → Projects → Contact → Resume → Home. Each page
+owns the hue at its left edge and previews the next page's hue at its right
+edge:
+
+- Home: violet at 18% opacity → sky at 14%.
+- Projects: sky at 15% → emerald at 11%.
+- Contact: emerald at 14% → amber at 10%.
+- Resume, including both resume variants: amber at 12% → violet at 12%.
+
+The zinc-950 base remains dominant. These washes are decorative atmosphere, not
+full-page themes, and they do not animate during navigation. Each page's small
+eyebrow label and line use its owning left-edge hue so the palette shift reads
+as intentional. Functional and content-specific accents remain unchanged:
+project colors, Contact cards, resume controls, buttons, and focus treatments do
+not inherit the page palette.
+
+`app/components/page-atmosphere.tsx` owns this typed four-variant mapping. It
+exports `PageAtmosphere({ variant })` for the decorative wash and the literal
+eyebrow text/line classes for each variant. All Tailwind class names remain
+complete string literals so production builds can discover them.
 
 ## Homepage
 
@@ -127,8 +152,8 @@ obvious after the proof section.
 
 ### Structure
 
-The page uses the shared navigation and the same background treatment as the
-homepage and Projects.
+The page uses the shared navigation and structural background treatment from
+the homepage and Projects, with its own emerald-to-amber atmosphere.
 
 Header:
 
@@ -167,6 +192,9 @@ The implementation will:
 - Add `app/components/home-project-proof.tsx`, exporting
   `HomeProjectProof({ project, index })`. It consumes a `Project` and renders
   one distinct evidence row without changing the Projects index.
+- Add `app/components/page-atmosphere.tsx` and replace the four duplicated
+  top-level radial washes with its typed Home, Projects, Contact, and Resume
+  variants.
 - Remove `app/components/particles.tsx`.
 - Remove `util/mouse.ts` after confirming it has no remaining consumers.
 - Remove `app/components/card.tsx` after confirming it has no remaining
@@ -199,6 +227,8 @@ configured `mailto:` handler.
 - The CrunchAtlas preview stacks cleanly on narrow screens.
 - The homepage technical-proof rows expose all three project facts without
   horizontal scrolling or clipped values.
+- Decorative atmosphere layers remain `aria-hidden` and do not change text
+  contrast.
 - No horizontal scrolling is introduced at 390 CSS pixels.
 - Removing the canvas means reduced-motion users receive the complete design
   without a degraded alternate state.
@@ -221,6 +251,9 @@ Before committing the implementation:
    no remaining imports before deleting them.
 9. Confirm the homepage no longer imports or renders `ProjectCard` or
    `ProjectVisual`, while `/projects` still uses its existing card presentation.
+10. Confirm Home, Projects, Contact, and both Resume routes render their assigned
+    left/right atmosphere and eyebrow hues, while project-detail pages retain
+    their project-specific accents.
 
 After the implementation is pushed, wait for the production Vercel deployment
 to reach Ready and verify the custom-domain routes.
