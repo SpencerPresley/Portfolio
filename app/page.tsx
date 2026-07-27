@@ -1,13 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { HomeProjectProof } from "./components/home-project-proof";
 import { Navigation } from "./components/nav";
 import {
 	PageAtmosphere,
 	pageAtmosphereStyles,
 } from "./components/page-atmosphere";
 import { getProject } from "./projects/project-data";
-import { ProjectCard } from "./projects/project-ui";
 
 const homeAtmosphere = pageAtmosphereStyles.home;
 
@@ -128,13 +128,12 @@ export default function Home() {
 						</div>
 					</article>
 
-					<div className="mt-5 grid gap-5 lg:grid-cols-2">
+					<div className="mt-5 divide-y divide-zinc-800 overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900/30">
 						{homepageProjects.map((project, index) => (
-							<ProjectCard
+							<HomeProjectProof
 								key={project.slug}
 								project={project}
-								index={index}
-								visual
+								index={index + 2}
 							/>
 						))}
 					</div>
