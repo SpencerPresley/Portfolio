@@ -6,20 +6,21 @@ import {
 	Braces,
 	Briefcase,
 	Database,
+	GitPullRequest,
 	Network,
 } from "lucide-react";
 import { Navigation } from "../components/nav";
-import { projects } from "./project-data";
+import { openSourceContributions, projects } from "./project-data";
 import { ProjectCard } from "./project-ui";
 
 export const metadata = {
 	title: "Projects",
 	description:
-		"Selected AI, retrieval, backend, and systems projects by Spencer Presley.",
+		"Selected AI, retrieval, backend, systems, and developer-tooling projects by Spencer Presley.",
 };
 
 const featuredProjects = projects.filter((project) => project.featured);
-const earlierProjects = projects.filter((project) => !project.featured);
+const moreProjects = projects.filter((project) => !project.featured);
 
 const disciplines = [
 	{
@@ -241,25 +242,86 @@ export default function ProjectsPage() {
 					</div>
 				</section>
 
-				<section className="pt-20" aria-labelledby="earlier-work">
+				<section className="pt-20" aria-labelledby="more-projects">
 					<div className="mb-8 flex items-center gap-4">
 						<span className="font-mono text-xs text-zinc-600">03</span>
 						<h2
-							id="earlier-work"
+							id="more-projects"
 							className="text-sm font-semibold uppercase tracking-[0.2em] text-zinc-300"
 						>
-							Earlier work
+							More projects
 						</h2>
 						<div className="h-px flex-1 bg-zinc-800" aria-hidden="true" />
 					</div>
 
 					<div className="grid gap-5 md:grid-cols-2">
-						{earlierProjects.map((project, index) => (
+						{moreProjects.map((project, index) => (
 							<ProjectCard
 								key={project.slug}
 								project={project}
 								index={featuredProjects.length + index}
 							/>
+						))}
+					</div>
+				</section>
+
+				<section className="pt-20" aria-labelledby="open-source-contributions">
+					<div className="mb-8 flex items-center gap-4">
+						<span className="font-mono text-xs text-zinc-600">04</span>
+						<h2
+							id="open-source-contributions"
+							className="text-sm font-semibold uppercase tracking-[0.2em] text-zinc-300"
+						>
+							Open-source contributions
+						</h2>
+						<div className="h-px flex-1 bg-zinc-800" aria-hidden="true" />
+					</div>
+
+					<div className="overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900/35">
+						{openSourceContributions.map((contribution, index) => (
+							<article
+								key={contribution.project}
+								className={`grid gap-6 p-6 sm:p-8 lg:grid-cols-[3rem_minmax(0,1fr)_auto] lg:items-start ${
+									index > 0 ? "border-t border-zinc-800" : ""
+								}`}
+							>
+								<span className="flex h-12 w-12 items-center justify-center rounded-2xl border border-violet-400/20 bg-violet-400/10 text-violet-300">
+									<GitPullRequest className="h-5 w-5" aria-hidden="true" />
+								</span>
+
+								<div>
+									<p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-violet-300">
+										{contribution.eyebrow} · {contribution.year}
+									</p>
+									<h3 className="mt-3 font-display text-3xl text-white">
+										{contribution.project}
+									</h3>
+									<p className="mt-4 max-w-3xl text-sm leading-7 text-zinc-400 sm:text-[0.95rem]">
+										{contribution.summary}
+									</p>
+									<p className="mt-3 max-w-3xl text-xs leading-6 text-zinc-600">
+										{contribution.credit}
+									</p>
+								</div>
+
+								<div className="flex flex-wrap gap-3 lg:justify-end">
+									{contribution.links.map((link) => (
+										<a
+											key={link.href}
+											href={link.href}
+											target="_blank"
+											rel="noreferrer"
+											className="inline-flex items-center gap-1.5 rounded-full border border-zinc-700 bg-zinc-950/60 px-4 py-2 text-sm text-zinc-300 transition hover:border-zinc-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-violet-400"
+										>
+											{link.label}
+											<ArrowUpRight
+												className="h-3.5 w-3.5"
+												aria-hidden="true"
+											/>
+										</a>
+									))}
+								</div>
+							</article>
 						))}
 					</div>
 				</section>

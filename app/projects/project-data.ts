@@ -67,6 +67,15 @@ export type Project = {
 	outcome: string;
 };
 
+export type OpenSourceContribution = {
+	project: string;
+	year: string;
+	eyebrow: string;
+	summary: string;
+	credit: string;
+	links: readonly ProjectLink[];
+};
+
 export const projectStatusLabels: Record<ProjectStatus, string> = {
 	active: "Active",
 	shipped: "Shipped",
@@ -412,6 +421,95 @@ export const projects: readonly Project[] = [
 		],
 		outcome:
 			"A public marketplace of focused Claude Code extensions whose main product constraint is predictable context: the right instruction, at the actual trigger, and nothing when it is irrelevant.",
+	},
+	{
+		slug: "dotfiles",
+		title: "dotfiles",
+		eyebrow: "Reproducible workstation",
+		summary:
+			"A chezmoi-managed macOS environment that bootstraps itself, keeps secrets out of Git, and treats machine configuration as tested infrastructure.",
+		lead: "dotfiles turns a fresh Mac into the workstation I actually use, then keeps it converged through chezmoi. The repository separates public configuration from credentials, owns package and LaunchAgent lifecycle, and includes a fully integrated Neovim environment with custom behavior tested like application code.",
+		year: "2026",
+		status: "active",
+		category: "Developer environment",
+		role: "Independent system · design, automation, and maintenance",
+		accent: "cyan",
+		featured: false,
+		stack: [
+			"chezmoi",
+			"Shell",
+			"Lua / Neovim",
+			"Homebrew",
+			"launchd",
+			"1Password",
+		],
+		links: [
+			{
+				label: "GitHub",
+				href: "https://github.com/SpencerPresley/dotfiles",
+			},
+		],
+		facts: [
+			{ label: "Bootstrap", value: "Fresh Mac to managed workstation" },
+			{ label: "Security", value: "1Password + staged secret scanning" },
+			{ label: "Validation", value: "43 checks + seeded property fuzzing" },
+		],
+		flow: [
+			"Fresh Mac",
+			"Interactive bootstrap",
+			"chezmoi + 1Password",
+			"Packages + LaunchAgents",
+			"Shell / terminal / editor",
+		],
+		sections: [
+			{
+				title: "Bootstrap once, converge afterward",
+				paragraphs: [
+					"The bootstrap takes a bare macOS installation through Xcode tools, Homebrew, 1Password, GitHub authentication, Oh My Zsh, package installation, and the first chezmoi apply. It pauses at the authentication boundaries that should remain interactive instead of pretending credentials can be automated safely.",
+					"After that first run, the repository becomes the source of truth. An ordinary chezmoi apply renders configuration and reruns only the lifecycle automation whose declared inputs changed.",
+				],
+			},
+			{
+				title: "Keep the repository public without storing credentials",
+				paragraphs: [
+					"Templates contain 1Password references rather than resolved tokens, passwords, host addresses, or private keys. Chezmoi renders those values only on the destination machine, while the 1Password SSH agent supplies private keys without copying key material into the repository.",
+					"A self-healing Git hook installs and wires gitleaks, then scans staged changes with redacted output. Chezmoi's private source attributes control destination permissions; they are not mistaken for secrecy in a public Git repository.",
+				],
+			},
+			{
+				title: "Manage machine lifecycle, not just dotfiles",
+				paragraphs: [
+					"Run-on-change scripts converge the parts of a workstation that cannot be represented by copying files. Homebrew metadata updates run every 12 hours through a command-scoped trust grant, while package and application upgrades remain a deliberate manual action.",
+					"Other scripts render Ollama settings into a per-user LaunchAgent, remove conflicting Tailscale installations, synchronize Ghostty's resolved palette into Yazi, and pin global command-line tools from structured data. Each automation path owns both its desired state and the repair logic for stale machine state.",
+				],
+			},
+			{
+				title: "Test editor behavior like application code",
+				paragraphs: [
+					"The Neovim configuration now lives directly in chezmoi alongside its LSP, formatting, navigation, Yazi, and Claude Code integrations. A custom `:Tail` command follows external file changes inside a normal editable buffer using libuv file events with a polling recovery path.",
+					"The implementation preserves a scrolled-up cursor, refuses to clobber unsaved edits, rearms after atomic rename or delete-and-recreate rotation, cleans up its handles, and disables itself above a size ceiling. A headless adversarial suite and recovery suite currently pass 43 checks; a seeded property fuzzer then mixes 900 file, buffer, cursor, and watcher operations while asserting invariants after every step.",
+				],
+			},
+		],
+		decisions: [
+			{
+				title: "Render secrets at the destination",
+				detail:
+					"Public templates carry references and intent; 1Password supplies credential values only while chezmoi applies them locally.",
+			},
+			{
+				title: "Update metadata, not running software",
+				detail:
+					"Background Homebrew automation refreshes package metadata but never silently upgrades active services or open applications.",
+			},
+			{
+				title: "Pair fast events with recovery",
+				detail:
+					"Neovim's live follower uses file events for low latency and polling for missed events, watcher rearming, and size enforcement.",
+			},
+		],
+		outcome:
+			"An actively used public workstation definition that can reconstruct a Mac, keeps credentials out of Git, and backs its most failure-prone custom editor behavior with deterministic tests and property fuzzing.",
 	},
 	{
 		slug: "iphoto-sizer",
@@ -911,6 +1009,28 @@ export const projects: readonly Project[] = [
 		],
 		outcome:
 			"TermBook won first place / Best Hack at Bitcamp 2024. The original live domain is no longer active, so the portfolio links to the surviving source rather than pretending the deployment still exists.",
+	},
+];
+
+export const openSourceContributions: readonly OpenSourceContribution[] = [
+	{
+		project: "mnemex",
+		year: "2026",
+		eyebrow: "Local embedding credentials",
+		summary:
+			"Diagnosed an unconditional OpenRouter key gate that prevented Ollama, LM Studio, and other local embedding providers from running without a dummy cloud credential, then proposed provider-aware validation.",
+		credit:
+			"The maintainer rebased the fix onto current main and retained Spencer and Claude as co-authors.",
+		links: [
+			{
+				label: "PR #3",
+				href: "https://github.com/MadAppGang/mnemex/pull/3",
+			},
+			{
+				label: "Upstream commit",
+				href: "https://github.com/MadAppGang/mnemex/commit/76df5df8c1900a8deb30f89ccc5920ad4bbf946f",
+			},
+		],
 	},
 ];
 

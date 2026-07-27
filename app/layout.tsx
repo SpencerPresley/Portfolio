@@ -44,9 +44,10 @@ export const metadata: Metadata = {
     title: "Spencer Presley",
     card: "summary_large_image",
   },
-  // icons: {
-  //   shortcut: "/favicon.png",
-  // },
+  icons: {
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+  },
 };
 const inter = Inter({
   subsets: ["latin"],
