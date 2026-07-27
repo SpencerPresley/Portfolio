@@ -163,6 +163,16 @@ The implementation will:
 Home and Contact remain server components except for the already-client-side
 shared navigation.
 
+## Failure and Degradation Behavior
+
+The redesigned pages fetch no runtime data, so their primary content does not
+depend on an API, browser animation, or successful client hydration. The
+CrunchAtlas preview retains meaningful text and a descriptive image alternative
+if its visual cannot be displayed. Every external destination is an ordinary
+link; one unavailable third-party site must not affect the rest of either page.
+The email address remains visible and copyable even when the visitor has no
+configured `mailto:` handler.
+
 ## Accessibility and Responsive Behavior
 
 - All navigation and calls to action are usable immediately from the keyboard.
