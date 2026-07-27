@@ -1,6 +1,6 @@
 # Homepage and Contact Redesign
 
-**Date:** 2026-07-27  
+**Date:** 2026-07-27
 **Status:** Approved for implementation
 
 ## Context
