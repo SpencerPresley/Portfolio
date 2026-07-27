@@ -11,10 +11,12 @@ export const metadata: Metadata = {
     default: "spencerpresley.com",
     template: "%s | spencerpresley.com",
   },
-  description: "Portfolio for Spencer Presley; author of Academic Metrics and ChainComposer",
+  description:
+    "Spencer Presley is a software engineer building reliable AI, backend, and platform systems.",
   openGraph: {
     title: "spencerpresley.com",
-    description: "Portfolio for Spencer Presley; author of Academic Metrics and ChainComposer",
+    description:
+      "Spencer Presley is a software engineer building reliable AI, backend, and platform systems.",
     url: "https://spencerpresley.com",
     siteName: "spencerpresley.com",
     images: [

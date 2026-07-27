@@ -4,20 +4,16 @@ import { Mdx } from "@/app/components/mdx";
 import { Header } from "./header";
 import { BackToTop } from "@/app/components/back-to-top";
 import "./mdx.css";
-import { ReportView } from "./view";
-import { Redis } from "@upstash/redis";
 
-export const revalidate = 60;
-
-type Props = {
-  params: {
-    slug: string;
-  };
+type Params = {
+  slug: string;
 };
 
-const redis = Redis.fromEnv();
+type Props = {
+  params: Promise<Params>;
+};
 
-export async function generateStaticParams(): Promise<Props["params"][]> {
+export async function generateStaticParams(): Promise<Params[]> {
   return allProjects
     .filter((p) => p.published)
     .map((p) => ({
@@ -26,20 +22,16 @@ export async function generateStaticParams(): Promise<Props["params"][]> {
 }
 
 export default async function PostPage({ params }: Props) {
-  const slug = params?.slug;
+  const { slug } = await params;
   const project = allProjects.find((project) => project.slug === slug);
 
   if (!project) {
     notFound();
   }
 
-  const views =
-    (await redis.get<number>(["pageviews", "projects", slug].join(":"))) ?? 0;
-
   return (
     <div className="bg-zinc-50 min-h-screen">
-      <Header project={project} views={views} />
-      <ReportView slug={project.slug} />
+      <Header project={project} />
 
       <article className="px-4 py-12 mx-auto prose prose-zinc prose-quoteless">
         <Mdx code={project.body.code} />

@@ -1,16 +1,10 @@
-"use client";
-import { Github, Mail, Twitter, Linkedin } from "lucide-react";
+import type { Metadata } from "next";
+import { Github, Mail, Linkedin } from "lucide-react";
 import Link from "next/link";
 import { Navigation } from "../components/nav";
 import { Card } from "../components/card";
 
 const socials = [
-	// {
-	// 	icon: <Twitter size={20} />,
-	// 	href: "https://twitter.com/chronark_",
-	// 	label: "Twitter",
-	// 	handle: "@chronark_",
-	// },
 	{
 		icon: <Mail size={20} />,
 		href: "mailto:spencer@spencerpresley.com",
@@ -31,14 +25,19 @@ const socials = [
 	},
 ];
 
-export default function Example() {
+export const metadata: Metadata = {
+	title: "Contact",
+	description: "Contact Spencer Presley by email, GitHub, or LinkedIn.",
+};
+
+export default function ContactPage() {
 	return (
 		<div className=" bg-gradient-to-tl from-zinc-900/0 via-zinc-900 to-zinc-900/0">
 			<Navigation />
 			<div className="container flex items-center justify-center min-h-screen px-4 mx-auto">
 				<div className="grid w-full grid-cols-1 gap-8 mx-auto mt-32 sm:mt-0 sm:grid-cols-3 lg:gap-16">
 					{socials.map((s) => (
-						<Card>
+						<Card key={s.label}>
 							<Link
 								href={s.href}
 								target="_blank"

@@ -1,23 +1,23 @@
 {
-  "name": "chronark.com",
+  "name": "spencerpresley.com",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "typecheck": "tsc --noEmit",
     "fmt": "pnpm rome check . --apply-unsafe && pnpm rome format . --write"
   },
   "dependencies": {
-    "@next/mdx": "^13.5.4",
-    "@upstash/redis": "^1.23.3",
+    "@next/mdx": "^15.5.22",
     "@vercel/analytics": "^1.5.0",
     "contentlayer": "^0.3.4",
     "esbuild": "0.18.20",
     "framer-motion": "^10.16.4",
     "lucide-react": "^0.284.0",
     "markdown-wasm": "^1.2.0",
-    "next": "^13.5.4",
+    "next": "^15.5.22",
     "next-contentlayer": "^0.3.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -45,13 +45,15 @@
   },
   "pnpm": {
     "overrides": {
+      "@grpc/grpc-js": "1.9.16",
       "@opentelemetry/api": "1.4.1",
       "@opentelemetry/core": "1.13.0",
       "@opentelemetry/exporter-trace-otlp-grpc": "0.39.1",
       "@opentelemetry/resources": "1.13.0",
       "@opentelemetry/sdk-trace-base": "1.13.0",
       "@opentelemetry/sdk-trace-node": "1.13.0",
-      "@opentelemetry/semantic-conventions": "1.13.0"
+      "@opentelemetry/semantic-conventions": "1.13.0",
+      "protobufjs": "7.6.3"
     }
   }
 }
