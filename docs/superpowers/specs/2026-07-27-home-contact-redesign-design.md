@@ -97,9 +97,22 @@ Projects page.
      the existing public boundary.
    - Link to the public CrunchAtlas site.
 2. **gloss** and the **Celery Fork-Safety Investigation** appear as equal
-   technical case-study cards.
-   - Reuse their existing typed project records and `ProjectCard` presentation.
-   - Link directly to their internal case-study routes.
+   technical-proof rows inside one grouped module.
+   - Reuse their existing typed project records as the canonical source for
+     titles, summaries, categories, years, and facts.
+   - Give the homepage a dedicated editorial presentation instead of reusing
+     `ProjectCard` or `ProjectVisual` from the Projects index.
+   - Each row contains the project identity, one concise summary, all three
+     existing proof points, and an explicit case-study call to action.
+   - The whole row links directly to its internal case-study route and retains a
+     visible keyboard focus treatment.
+   - Do not repeat the Projects page's system-map visual, technology pills,
+     status pill, or large standalone-card chrome.
+
+The two rows share a single rounded border and stack vertically. On wide
+screens, project identity, evidence, and the call to action form three editorial
+columns. On narrow screens, they stack in reading order without truncating the
+proof values.
 
 This ordering communicates production scope first, followed by public evidence
 that a visitor can inspect in depth.
@@ -150,7 +163,10 @@ The implementation will:
 
 - Replace the homepage splash markup with the server-rendered editorial page.
 - Replace the old Contact cards with page-local static presentation.
-- Reuse `Navigation`, `ProjectCard`, and the existing typed project records.
+- Reuse `Navigation` and the existing typed project records.
+- Add `app/components/home-project-proof.tsx`, exporting
+  `HomeProjectProof({ project, index })`. It consumes a `Project` and renders
+  one distinct evidence row without changing the Projects index.
 - Remove `app/components/particles.tsx`.
 - Remove `util/mouse.ts` after confirming it has no remaining consumers.
 - Remove `app/components/card.tsx` after confirming it has no remaining
@@ -180,7 +196,9 @@ configured `mailto:` handler.
 - The page hierarchy contains one `h1` per route and ordered section headings.
 - External links identify their destination and use safe new-tab attributes.
 - The email action uses `mailto:` without unnecessarily opening a new tab.
-- Selected-work cards stack cleanly on narrow screens.
+- The CrunchAtlas preview stacks cleanly on narrow screens.
+- The homepage technical-proof rows expose all three project facts without
+  horizontal scrolling or clipped values.
 - No horizontal scrolling is introduced at 390 CSS pixels.
 - Removing the canvas means reduced-motion users receive the complete design
   without a degraded alternate state.
@@ -201,6 +219,8 @@ Before committing the implementation:
    stale public occurrence remains.
 8. Confirm `framer-motion`, `Particles`, the mouse hook, and the old `Card` have
    no remaining imports before deleting them.
+9. Confirm the homepage no longer imports or renders `ProjectCard` or
+   `ProjectVisual`, while `/projects` still uses its existing card presentation.
 
 After the implementation is pushed, wait for the production Vercel deployment
 to reach Ready and verify the custom-domain routes.
