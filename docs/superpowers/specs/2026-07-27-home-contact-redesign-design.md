@@ -1,7 +1,7 @@
 # Homepage and Contact Redesign
 
 **Date:** 2026-07-27  
-**Status:** Design approved in conversation; implementation waits on written-spec review
+**Status:** Approved for implementation
 
 ## Context
 
