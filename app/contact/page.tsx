@@ -1,26 +1,7 @@
 import type { Metadata } from "next";
-import { Github, Mail, Linkedin } from "lucide-react";
-import Link from "next/link";
+import { ArrowUpRight, Github, Linkedin, Mail } from "lucide-react";
 import { Navigation } from "../components/nav";
-import { Card } from "../components/card";
 import { siteContact } from "../site-data";
-
-const socials = [
-	{
-		icon: <Mail size={20} />,
-		href: `mailto:${siteContact.email}`,
-		label: "Email",
-		handle: siteContact.email,
-	},
-	{
-		icon: <Github size={20} />,
-		...siteContact.github,
-	},
-	{
-		icon: <Linkedin size={20} />,
-		...siteContact.linkedin,
-	},
-];
 
 export const metadata: Metadata = {
 	title: "Contact",
@@ -28,38 +9,93 @@ export const metadata: Metadata = {
 };
 
 export default function ContactPage() {
+	const profiles = [
+		{ icon: Github, ...siteContact.github },
+		{ icon: Linkedin, ...siteContact.linkedin },
+	];
+
 	return (
-		<div className=" bg-gradient-to-tl from-zinc-900/0 via-zinc-900 to-zinc-900/0">
+		<div className="relative min-h-screen overflow-hidden bg-zinc-950 text-zinc-100">
+			<div
+				className="pointer-events-none absolute inset-x-0 top-0 h-[48rem] bg-[radial-gradient(circle_at_15%_0%,rgba(124,58,237,0.16),transparent_38%),radial-gradient(circle_at_85%_12%,rgba(14,165,233,0.13),transparent_34%)]"
+				aria-hidden="true"
+			/>
+			<div
+				className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.025)_1px,transparent_1px)] bg-[size:72px_72px] [mask-image:linear-gradient(to_bottom,black,transparent_48%)]"
+				aria-hidden="true"
+			/>
 			<Navigation />
-			<div className="container flex items-center justify-center min-h-screen px-4 mx-auto">
-				<div className="grid w-full grid-cols-1 gap-8 mx-auto mt-32 sm:mt-0 sm:grid-cols-3 lg:gap-16">
-					{socials.map((s) => (
-						<Card key={s.label}>
-							<Link
-								href={s.href}
+
+			<main className="relative mx-auto max-w-7xl px-6 pb-24 pt-32 lg:px-8 lg:pt-40">
+				<header className="max-w-4xl border-b border-zinc-800 pb-14">
+					<p className="mb-6 flex items-center gap-3 font-mono text-xs uppercase tracking-[0.22em] text-violet-300">
+						<span className="h-px w-8 bg-violet-400/70" aria-hidden="true" />
+						Contact
+					</p>
+					<h1 className="font-display text-5xl leading-[0.98] tracking-tight text-white sm:text-6xl lg:text-7xl">
+						Let's talk.
+					</h1>
+					<p className="mt-7 max-w-2xl text-base leading-8 text-zinc-400 sm:text-lg">
+						Email is the best way to reach me. You can also find my public
+						work on GitHub and connect on LinkedIn.
+					</p>
+				</header>
+
+				<section className="pt-12" aria-labelledby="contact-methods">
+					<h2 id="contact-methods" className="sr-only">
+						Contact methods
+					</h2>
+
+					<a
+						href={`mailto:${siteContact.email}`}
+						className="group grid gap-6 rounded-3xl border border-sky-400/20 bg-zinc-900/55 p-7 transition hover:border-sky-300/40 hover:bg-zinc-900/75 focus:outline-none focus:ring-2 focus:ring-sky-400 sm:p-10 lg:grid-cols-[3rem_minmax(0,1fr)_auto] lg:items-center"
+					>
+						<span className="flex h-12 w-12 items-center justify-center rounded-2xl border border-sky-400/20 bg-sky-400/10 text-sky-300">
+							<Mail className="h-5 w-5" aria-hidden="true" />
+						</span>
+						<span>
+							<span className="block font-mono text-[0.68rem] uppercase tracking-[0.2em] text-sky-300">
+								Email me
+							</span>
+							<span className="mt-3 block break-all font-display text-2xl leading-tight text-white sm:text-4xl">
+								{siteContact.email}
+							</span>
+						</span>
+						<ArrowUpRight
+							className="h-5 w-5 text-zinc-600 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-sky-300"
+							aria-hidden="true"
+						/>
+					</a>
+
+					<div className="mt-5 grid gap-5 sm:grid-cols-2">
+						{profiles.map(({ icon: Icon, label, handle, href }) => (
+							<a
+								key={label}
+								href={href}
 								target="_blank"
-								className="p-4 relative flex flex-col items-center gap-4 duration-700 group md:gap-8 md:py-16 lg:pb-32 md:px-8"
+								rel="noreferrer"
+								className="group flex items-center gap-5 rounded-3xl border border-zinc-800 bg-zinc-900/35 p-6 transition hover:-translate-y-1 hover:border-zinc-600 hover:bg-zinc-900/60 focus:outline-none focus:ring-2 focus:ring-violet-400 sm:p-8"
 							>
-								<span
-									className="absolute w-px h-2/3 bg-gradient-to-b from-zinc-500 via-zinc-500/50 to-transparent"
+								<span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-violet-400/20 bg-violet-400/10 text-violet-300">
+									<Icon className="h-5 w-5" aria-hidden="true" />
+								</span>
+								<span className="min-w-0">
+									<span className="block font-mono text-[0.65rem] uppercase tracking-[0.18em] text-zinc-600">
+										{label}
+									</span>
+									<span className="mt-2 block truncate text-base font-medium text-zinc-200 transition group-hover:text-white">
+										{handle}
+									</span>
+								</span>
+								<ArrowUpRight
+									className="ml-auto h-4 w-4 shrink-0 text-zinc-600 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-violet-300"
 									aria-hidden="true"
 								/>
-								<span className="relative z-10 flex items-center justify-center w-12 h-12 text-sm duration-1000 border rounded-full text-zinc-200 group-hover:text-white group-hover:bg-zinc-900 border-zinc-500 bg-zinc-900 group-hover:border-zinc-200 drop-shadow-orange">
-									{s.icon}
-								</span>{" "}
-								<div className="z-10 flex flex-col items-center">
-									<span className="lg:text-xl font-medium duration-150 xl:text-2xl text-zinc-200 group-hover:text-white font-display text-center break-words">
-										{s.handle}
-									</span>
-									<span className="mt-4 text-sm text-center duration-1000 text-zinc-400 group-hover:text-zinc-200">
-										{s.label}
-									</span>
-								</div>
-							</Link>
-						</Card>
-					))}
-				</div>
-			</div>
+							</a>
+						))}
+					</div>
+				</section>
+			</main>
 		</div>
 	);
 }
