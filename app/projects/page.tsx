@@ -133,13 +133,13 @@ export default function ProjectsPage() {
 									CrunchAtlas / AtlasCyber
 								</h3>
 								<p className="mt-5 text-sm leading-7 text-zinc-400 sm:text-[0.95rem]">
-									I build the local-first AI and backend systems behind
-									AtlasCyber: evidence-grounded network analysis agents, the
-									agent runtime and sandboxing layer, Postgres-native job and
-									GPU orchestration, and local model serving. The product runs
-									in cloud, on-prem, and air-gapped environments; this
-									deliberately redacted marketing image is the boundary of what
-									I show publicly.
+									At CrunchAtlas, I build the AI and backend infrastructure for
+									AtlasCyber, a local-first security platform: evidence-grounded
+									network analysis agents, the agent runtime and sandboxing
+									layer, Postgres-native job and GPU orchestration, and local
+									model serving. It runs in cloud, on-prem, and air-gapped
+									environments; this deliberately redacted marketing image is
+									the boundary of what I show publicly.
 								</p>
 								<a
 									href="https://www.crunchatlas.com/"
