@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
+import { Navigation } from "../../components/nav";
 import { getNextProject, getProject, projects } from "../project-data";
 import {
 	projectAccentStyles,
@@ -70,8 +71,10 @@ export default async function ProjectPage({ params }: Props) {
 				aria-hidden="true"
 			/>
 
-			<main className="relative mx-auto max-w-7xl px-6 pb-24 pt-10 lg:px-8">
-				<nav className="flex items-center justify-between" aria-label="Project">
+			<Navigation />
+
+			<main className="relative mx-auto max-w-7xl px-6 pb-24 pt-32 lg:px-8 lg:pt-40">
+				<nav className="flex items-center" aria-label="Project">
 					<Link
 						href="/projects"
 						className="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-950/60 px-4 py-2 text-sm text-zinc-400 backdrop-blur transition hover:border-zinc-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-sky-400"
@@ -79,15 +82,9 @@ export default async function ProjectPage({ params }: Props) {
 						<ArrowLeft className="h-4 w-4" aria-hidden="true" />
 						All projects
 					</Link>
-					<Link
-						href="/resume"
-						className="text-sm text-zinc-500 transition hover:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-sky-400"
-					>
-						Resume
-					</Link>
 				</nav>
 
-				<header className="pb-14 pt-20 sm:pt-28">
+				<header className="pb-14 pt-16 sm:pt-20">
 					<div className="flex flex-wrap items-center gap-3">
 						<ProjectStatusPill status={project.status} />
 						<span className="font-mono text-[0.68rem] uppercase tracking-[0.18em] text-zinc-500">

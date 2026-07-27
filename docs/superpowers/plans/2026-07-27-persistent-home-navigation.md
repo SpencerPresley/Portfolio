@@ -4,7 +4,7 @@
 
 **Goal:** Replace the route-dependent back-arrow control with a persistent `Spencer Presley` Home link and add a visible active indicator to the current right-side destination.
 
-**Architecture:** Keep `app/components/nav.tsx` as the only implementation surface. Continue using `usePathname()` for route-family state and the existing intersection observer for the fixed-header background; change only the DOM order, Home affordance, focus treatment, and active indicator.
+**Architecture:** Continue using `usePathname()` for route-family state and the existing intersection observer for the fixed-header background. Change the shared component's DOM order, Home affordance, focus treatment, and active indicator, then mount that component on the generic project-detail route while retaining its local `All projects` context link.
 
 **Tech Stack:** Next.js 15 App Router, React 18 client component, TypeScript 5, Tailwind CSS 3, Lucide removal, pnpm, Rome 12.
 
@@ -21,8 +21,21 @@
 - Remove `ArrowLeft`, the icon-only Home control, and `flex-row-reverse`.
 - Preserve the existing intersection-observer behavior and fixed-header background transition.
 - Add visible `focus-visible` treatment to all four links.
-- Add no dependency and modify no other production file.
+- Add no dependency.
+- Mount the shared navigation on `app/projects/[slug]/page.tsx`, retain its
+  local `All projects` link, remove its duplicate local `Resume` link, and
+  preserve enough top spacing for the fixed header.
 - Verify at 1440×900 and 390×844.
+
+## Execution Correction
+
+The inline source-text contract below remains a structural audit only. It is not
+the TDD red/green gate. Before changing `app/components/nav.tsx`, add the
+`navigation` suite to `scripts/site-contract.mjs`, run it against the real
+production server, and observe the current navigation fail. After the component
+change, rerun the same shipped suite and require it to pass. The suite asserts
+rendered link order, destinations, `aria-current`, and the non-color active
+indicator rather than grepping TypeScript implementation text.
 
 ---
 
@@ -30,6 +43,9 @@
 
 **Files:**
 - Modify: `app/components/nav.tsx`
+- Modify: `app/projects/[slug]/page.tsx`
+- Create: `scripts/site-contract.mjs`
+- Modify: `package.json`
 
 **Interfaces:**
 - Consumes: `usePathname(): string | null`
@@ -156,6 +172,7 @@ export function Navigation() {
 								{label}
 								{isCurrent ? (
 									<span
+										data-active-indicator="true"
 										className="absolute -bottom-1 left-1/2 h-px w-5 -translate-x-1/2 bg-zinc-100"
 										aria-hidden="true"
 									/>
@@ -171,13 +188,17 @@ export function Navigation() {
 ```
 
 Do not move the observer or header background behavior into a new component.
+Mount `Navigation` above the generic project-detail `<main>`, retain the local
+`All projects` control, remove the duplicate local `Resume` link, and increase
+the route's top padding so both navigation layers remain distinct.
 
 - [ ] **Step 3: Run the source contract and static verification**
 
-Rerun the Step 1 source contract, then run:
+Rerun the Step 1 source audit and the shipped runtime contract, then run:
 
 ```bash
-pnpm exec rome check app/components/nav.tsx
+pnpm test:site navigation
+pnpm exec rome check app/components/nav.tsx 'app/projects/[slug]/page.tsx' scripts/site-contract.mjs
 pnpm typecheck
 pnpm build
 git diff --check
@@ -185,7 +206,8 @@ git diff --check
 
 Expected:
 
-- The source contract prints `Persistent navigation source contract passes.`
+- The source audit prints `Persistent navigation source contract passes.`
+- The runtime contract prints `navigation site contract passes.`
 - Rome, TypeScript, and the production build pass.
 - The build retains the existing Home, Projects, Contact, Resume, and project
   detail routes.
@@ -243,10 +265,15 @@ git diff -- app/components/nav.tsx
 git diff --check
 ```
 
-Then commit only the navigation file:
+Then commit the navigation implementation, its runtime contract, and the
+corrected navigation documentation:
 
 ```bash
-git add app/components/nav.tsx
+git add app/components/nav.tsx 'app/projects/[slug]/page.tsx' \
+  scripts/site-contract.mjs package.json \
+  docs/superpowers/specs/2026-07-27-navigation-home-link-design.md \
+  docs/superpowers/plans/2026-07-27-persistent-home-navigation.md \
+  docs/superpowers/plans/2026-07-27-professional-case-studies.md
 git diff --cached --check
 git commit -m "feat: make the home wordmark persistent"
 ```
@@ -256,7 +283,7 @@ git commit -m "feat: make the home wordmark persistent"
 Run:
 
 ```bash
-git push origin main
+git push -u origin feature/professional-case-studies
 portfolio_navigation_sha="$(git rev-parse HEAD)"
 vercel ls --prod -m "githubCommitSha=${portfolio_navigation_sha}"
 ```

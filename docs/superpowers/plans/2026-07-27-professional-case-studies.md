@@ -28,6 +28,22 @@
 - Add no dependency.
 - Verify at 1440×900 and 390×844.
 
+## Execution Correction
+
+The inline source-text contracts below are supplemental structural audits, not
+TDD gates. Behavior is tested by the shipped
+`scripts/site-contract.mjs` against a real Next production server.
+
+- Add each runtime suite before its production change and observe the expected
+  failure.
+- Fold the shared data/UI foundation into the CrunchAtlas task so the first
+  foundation commit also produces the real `/projects/crunchatlas` behavior.
+- Add and pass the `crunchatlas` suite before that combined commit.
+- Add and pass the `atlasconnect` suite before the AtlasConnect commit.
+- Add and pass the `previews` suite before the Home/Projects integration
+  commit.
+- Keep the source-text checks only as privacy and forbidden-dependency audits.
+
 ---
 
 ### Task 1: Add the typed professional-work foundation
