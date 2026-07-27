@@ -10,6 +10,10 @@ import {
 	Network,
 } from "lucide-react";
 import { Navigation } from "../components/nav";
+import {
+	PageAtmosphere,
+	pageAtmosphereStyles,
+} from "../components/page-atmosphere";
 import { openSourceContributions, projects } from "./project-data";
 import { ProjectCard } from "./project-ui";
 
@@ -21,6 +25,7 @@ export const metadata = {
 
 const featuredProjects = projects.filter((project) => project.featured);
 const moreProjects = projects.filter((project) => !project.featured);
+const projectsAtmosphere = pageAtmosphereStyles.projects;
 
 const disciplines = [
 	{
@@ -43,10 +48,7 @@ const disciplines = [
 export default function ProjectsPage() {
 	return (
 		<div className="relative min-h-screen overflow-hidden bg-zinc-950 text-zinc-100">
-			<div
-				className="pointer-events-none absolute inset-x-0 top-0 h-[52rem] bg-[radial-gradient(circle_at_18%_0%,rgba(124,58,237,0.16),transparent_36%),radial-gradient(circle_at_82%_8%,rgba(14,165,233,0.13),transparent_34%)]"
-				aria-hidden="true"
-			/>
+			<PageAtmosphere variant="projects" />
 			<div
 				className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.025)_1px,transparent_1px)] bg-[size:72px_72px] [mask-image:linear-gradient(to_bottom,black,transparent_38%)]"
 				aria-hidden="true"
@@ -56,8 +58,13 @@ export default function ProjectsPage() {
 			<main className="relative mx-auto max-w-7xl px-6 pb-24 pt-32 lg:px-8 lg:pt-40">
 				<header className="grid gap-14 border-b border-zinc-800 pb-16 lg:grid-cols-[minmax(0,1fr)_23rem] lg:items-end">
 					<div className="max-w-4xl">
-						<p className="mb-6 flex items-center gap-3 font-mono text-xs uppercase tracking-[0.22em] text-violet-300">
-							<span className="h-px w-8 bg-violet-400/70" aria-hidden="true" />
+						<p
+							className={`mb-6 flex items-center gap-3 font-mono text-xs uppercase tracking-[0.22em] ${projectsAtmosphere.eyebrowText}`}
+						>
+							<span
+								className={`h-px w-8 ${projectsAtmosphere.eyebrowLine}`}
+								aria-hidden="true"
+							/>
 							Selected work
 						</p>
 						<h1 className="font-display text-5xl leading-[0.98] tracking-tight text-white sm:text-6xl lg:text-7xl">

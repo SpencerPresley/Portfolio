@@ -7,6 +7,10 @@ import {
   Mail,
 } from "lucide-react";
 import { Navigation } from "../components/nav";
+import {
+  PageAtmosphere,
+  pageAtmosphereStyles,
+} from "../components/page-atmosphere";
 import { siteContact } from "../site-data";
 import {
   type ResumeBullet,
@@ -15,6 +19,8 @@ import {
   resumeFocuses,
   resumeVariants,
 } from "./resume-data";
+
+const resumeAtmosphere = pageAtmosphereStyles.resume;
 
 function InlineCode({ text }: { text: string }) {
   return (
@@ -75,10 +81,7 @@ export function ResumeView({
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-zinc-950 text-zinc-100">
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-[42rem] bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.13),transparent_42%),radial-gradient(circle_at_75%_15%,rgba(124,58,237,0.12),transparent_36%)]"
-        aria-hidden="true"
-      />
+      <PageAtmosphere variant="resume" />
       <div
         className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.025)_1px,transparent_1px)] bg-[size:72px_72px] [mask-image:linear-gradient(to_bottom,black,transparent_45%)]"
         aria-hidden="true"
@@ -88,8 +91,13 @@ export function ResumeView({
       <main className="relative mx-auto max-w-7xl px-6 pb-24 pt-32 lg:px-8 lg:pt-40">
         <header className="grid gap-12 border-b border-zinc-800 pb-16 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-end">
           <div className="max-w-4xl">
-            <p className="mb-6 flex items-center gap-3 font-mono text-xs uppercase tracking-[0.22em] text-sky-300">
-              <span className="h-px w-8 bg-sky-400/70" aria-hidden="true" />
+            <p
+              className={`mb-6 flex items-center gap-3 font-mono text-xs uppercase tracking-[0.22em] ${resumeAtmosphere.eyebrowText}`}
+            >
+              <span
+                className={`h-px w-8 ${resumeAtmosphere.eyebrowLine}`}
+                aria-hidden="true"
+              />
               Resume · {resume.shortLabel}
             </p>
             <h1 className="max-w-4xl font-display text-5xl leading-[0.98] tracking-tight text-white sm:text-6xl lg:text-7xl">

@@ -1,12 +1,18 @@
 import type { Metadata } from "next";
 import { ArrowUpRight, Github, Linkedin, Mail } from "lucide-react";
 import { Navigation } from "../components/nav";
+import {
+	PageAtmosphere,
+	pageAtmosphereStyles,
+} from "../components/page-atmosphere";
 import { siteContact } from "../site-data";
 
 export const metadata: Metadata = {
 	title: "Contact",
 	description: "Contact Spencer Presley by email, GitHub, or LinkedIn.",
 };
+
+const contactAtmosphere = pageAtmosphereStyles.contact;
 
 export default function ContactPage() {
 	const profiles = [
@@ -16,10 +22,7 @@ export default function ContactPage() {
 
 	return (
 		<div className="relative min-h-screen overflow-hidden bg-zinc-950 text-zinc-100">
-			<div
-				className="pointer-events-none absolute inset-x-0 top-0 h-[48rem] bg-[radial-gradient(circle_at_15%_0%,rgba(124,58,237,0.16),transparent_38%),radial-gradient(circle_at_85%_12%,rgba(14,165,233,0.13),transparent_34%)]"
-				aria-hidden="true"
-			/>
+			<PageAtmosphere variant="contact" />
 			<div
 				className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.025)_1px,transparent_1px)] bg-[size:72px_72px] [mask-image:linear-gradient(to_bottom,black,transparent_48%)]"
 				aria-hidden="true"
@@ -28,8 +31,13 @@ export default function ContactPage() {
 
 			<main className="relative mx-auto max-w-7xl px-6 pb-24 pt-32 lg:px-8 lg:pt-40">
 				<header className="max-w-4xl border-b border-zinc-800 pb-14">
-					<p className="mb-6 flex items-center gap-3 font-mono text-xs uppercase tracking-[0.22em] text-violet-300">
-						<span className="h-px w-8 bg-violet-400/70" aria-hidden="true" />
+					<p
+						className={`mb-6 flex items-center gap-3 font-mono text-xs uppercase tracking-[0.22em] ${contactAtmosphere.eyebrowText}`}
+					>
+						<span
+							className={`h-px w-8 ${contactAtmosphere.eyebrowLine}`}
+							aria-hidden="true"
+						/>
 						Contact
 					</p>
 					<h1 className="font-display text-5xl leading-[0.98] tracking-tight text-white sm:text-6xl lg:text-7xl">
