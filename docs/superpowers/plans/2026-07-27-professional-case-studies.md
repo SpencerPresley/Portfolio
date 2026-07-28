@@ -167,7 +167,7 @@ export const professionalWork = {
 		lead:
 			"I build the systems that keep long-running security agents bounded, observable, and useful on local hardware. I also built PurpleHaze end to end.",
 		role:
-			"I built the systems described here, built PurpleHaze end to end, and built most of AtlasCyber's AI and backend platform. I also own AtlasCyber's AWS across GovCloud and commercial partitions.",
+			"I built PurpleHaze end to end and most of AtlasCyber's AI and backend platform, including the systems described here. I also own AtlasCyber's AWS across GovCloud and commercial partitions.",
 		accent: "amber",
 		external: {
 			label: "Visit CrunchAtlas",
@@ -186,8 +186,8 @@ export const professionalWork = {
 			"Inspectable analysis",
 		],
 		image: {
-			src: "/projects/crunchatlas-campaign-teaser.webp",
-			alt: "CrunchAtlas marketing view showing a redacted network security campaign summary",
+			src: "/projects/crunchatlas-campaign-assessment.webp",
+			alt: "Public CrunchAtlas marketing view showing a network security campaign summary",
 		},
 	},
 	atlasconnect: {
@@ -331,7 +331,7 @@ export function CaseStudyHero({
 		<header className="border-b border-zinc-800 pb-16">
 			<Link
 				href="/projects"
-				className={`inline-flex items-center gap-2 rounded-sm text-sm text-zinc-500 transition hover:text-white focus:outline-none focus-visible:ring-2 ${accent.ring}`}
+				className={`inline-flex items-center gap-2 rounded-sm text-sm text-zinc-400 transition hover:text-white focus:outline-none focus-visible:ring-2 ${accent.ring}`}
 			>
 				<ArrowLeft className="h-4 w-4" aria-hidden="true" />
 				All projects
@@ -344,7 +344,7 @@ export function CaseStudyHero({
 					>
 						{work.title}
 					</p>
-					<p className="mt-3 font-mono text-[0.68rem] uppercase tracking-[0.18em] text-zinc-600">
+					<p className="mt-3 font-mono text-[0.68rem] uppercase tracking-[0.18em] text-zinc-400">
 						{work.eyebrow} · {work.period}
 					</p>
 					<h1 className="mt-6 font-display text-5xl leading-[0.96] tracking-tight text-white sm:text-6xl lg:text-7xl">
@@ -356,7 +356,7 @@ export function CaseStudyHero({
 				</div>
 
 				<aside className="border-l border-zinc-800 pl-7">
-					<p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-zinc-600">
+					<p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-zinc-400">
 						My role
 					</p>
 					<p className="mt-3 text-sm leading-7 text-zinc-300">{work.role}</p>
@@ -403,7 +403,7 @@ export function CaseStudySection({
 		<section className="border-b border-zinc-800 py-20" aria-labelledby={id}>
 			<div className="grid gap-10 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-20">
 				<div>
-					<p className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-600">
+					<p className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-400">
 						{number} · {eyebrow}
 					</p>
 				</div>
@@ -481,7 +481,7 @@ export function DetailGrid({
 					<h3 className="mt-5 text-base font-semibold text-zinc-100">
 						{item.title}
 					</h3>
-					<p className="mt-3 text-sm leading-7 text-zinc-500">
+					<p className="mt-3 text-sm leading-7 text-zinc-400">
 						{item.detail}
 					</p>
 				</article>
@@ -513,7 +513,7 @@ export function MarketingShot({
 					className="object-cover"
 				/>
 			</div>
-			<figcaption className="border-t border-zinc-800 px-6 py-4 text-xs leading-6 text-zinc-500">
+			<figcaption className="border-t border-zinc-800 px-6 py-4 text-xs leading-6 text-zinc-400">
 				{caption}
 			</figcaption>
 		</figure>
@@ -536,14 +536,14 @@ export function ProfessionalCaseStudyFooter({
 				className="group grid gap-8 border-y border-zinc-800 py-12 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky-400 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end"
 			>
 				<div>
-					<p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-zinc-600">
+					<p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-zinc-400">
 						Next professional case study
 					</p>
 					<p className="mt-4 font-display text-3xl text-zinc-200 transition group-hover:text-white sm:text-4xl">
 						{next.title}
 					</p>
 				</div>
-				<span className="inline-flex items-center gap-2 text-sm text-zinc-500 transition group-hover:text-zinc-200">
+				<span className="inline-flex items-center gap-2 text-sm text-zinc-400 transition group-hover:text-zinc-200">
 					Keep reading
 					<ArrowRight
 						className="h-4 w-4 transition group-hover:translate-x-1"
@@ -553,7 +553,7 @@ export function ProfessionalCaseStudyFooter({
 			</Link>
 			<Link
 				href="/projects"
-				className="mt-8 inline-flex rounded-sm text-sm text-zinc-500 transition hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+				className="mt-8 inline-flex rounded-sm text-sm text-zinc-400 transition hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
 			>
 				Return to all projects
 			</Link>
@@ -770,7 +770,7 @@ export default function CrunchAtlasCaseStudy() {
 		<CaseStudyShell work={work}>
 			<CaseStudyHero
 				work={work}
-				disclosure="This case study describes system boundaries and engineering mechanisms. It omits customer data, proprietary detection logic, exact offensive procedures, private prompts, and private source."
+				disclosure="This case study describes system boundaries and engineering mechanisms. It omits customer data, proprietary detection logic, exact offensive procedures, private prompts, and private source code."
 			/>
 
 			<CaseStudySection

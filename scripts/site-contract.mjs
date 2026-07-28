@@ -207,9 +207,53 @@ async function contactSuite() {
 	);
 }
 
+async function crunchAtlasSuite() {
+	const html = await renderedPage("/projects/crunchatlas");
+	const content = mainContent(html);
+	const text = visibleText(content);
+
+	assert.ok(
+		html.includes('data-professional-case-study="crunchatlas"'),
+		"CrunchAtlas must render through the professional case-study shell",
+	);
+	for (const expected of [
+		"Reliable local AI where cloud assumptions break.",
+		"Deterministic scaffolding around fallible local models.",
+		"PurpleHaze",
+		"CrunchSense v3",
+		"GovCloud",
+		"This case study describes system boundaries",
+	]) {
+		assert.ok(text.includes(expected), `CrunchAtlas must explain ${expected}`);
+	}
+	for (const image of [
+		"crunchatlas-campaign-assessment.webp",
+		"crunchatlas-agent-report.webp",
+	]) {
+		assert.ok(content.includes(image), `CrunchAtlas must render ${image}`);
+	}
+	assert.ok(
+		content.includes('href="https://www.crunchatlas.com/"'),
+		"CrunchAtlas must link to the public product site",
+	);
+	assert.ok(
+		content.includes('href="/projects/atlasconnect"'),
+		"CrunchAtlas must link to the next professional case study",
+	);
+	const canonical = [...html.matchAll(/<link\b([^>]*)>/gi)].find(
+		(match) => attribute(match[1], "rel") === "canonical",
+	);
+	assert.equal(
+		attribute(canonical?.[1] ?? "", "href"),
+		"https://spencerpresley.com/projects/crunchatlas",
+		"CrunchAtlas must publish its canonical project URL as a canonical link",
+	);
+}
+
 const suites = {
 	"chain-composer": chainComposerSuite,
 	contact: contactSuite,
+	crunchatlas: crunchAtlasSuite,
 	navigation: navigationSuite,
 };
 
