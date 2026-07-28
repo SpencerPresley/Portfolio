@@ -31,6 +31,26 @@ export type ProjectDecision = {
 	detail: string;
 };
 
+export type ProjectCodeSample = {
+	label: string;
+	title: string;
+	detail: string;
+	code: string;
+};
+
+export type ProjectCodeComparison = {
+	eyebrow: string;
+	title: string;
+	description: string;
+	samples: readonly [ProjectCodeSample, ProjectCodeSample];
+};
+
+export type ProjectRelationship = {
+	slug: string;
+	eyebrow: string;
+	detail: string;
+};
+
 export type ProjectImage = {
 	src: string;
 	alt: string;
@@ -65,6 +85,8 @@ export type Project = {
 	sections: readonly ProjectSection[];
 	decisions: readonly ProjectDecision[];
 	outcome: string;
+	codeComparison?: ProjectCodeComparison;
+	relatedProjects?: readonly ProjectRelationship[];
 };
 
 export type OpenSourceContribution = {
@@ -623,6 +645,14 @@ export const projects: readonly Project[] = [
 				href: "https://pypi.org/project/academic-metrics/",
 			},
 		],
+		relatedProjects: [
+			{
+				slug: "chain_composer",
+				eyebrow: "Extracted developer tool",
+				detail:
+					"The embedded workflow layer that powered this classifier was later reorganized and published as ChainComposer.",
+			},
+		],
 		facts: [
 			{ label: "Taxonomy", value: "Three-level NSF hierarchy" },
 			{ label: "Collection", value: "Crossref + DOI enrichment" },
@@ -659,6 +689,7 @@ export const projects: readonly Project[] = [
 				title: "A package, not a hidden pipeline",
 				paragraphs: [
 					"Academic Metrics ships as an installable Python package with a CLI, storage adapters, export paths, and full Sphinx documentation. The web demo is a separate collaborator-owned consumer; the reusable package is the project presented here.",
+					"The LLM stages run through an earlier embedded version of ChainComposer. Academic Metrics was its production proving ground: the classifier declares method extraction, sentence analysis, summarization, recursive classification, and theme recognition across three managers, then carries named outputs into later prompts. That implementation was later extracted and published as its own package.",
 				],
 			},
 		],
@@ -687,8 +718,8 @@ export const projects: readonly Project[] = [
 		title: "ChainComposer",
 		eyebrow: "Python library",
 		summary:
-			"A small orchestration layer for composing multi-stage LLM workflows with explicit variable flow and structured outputs.",
-		lead: "ChainComposer grew out of the machinery behind Academic Metrics. It packages multi-layer prompts, state transfer, provider selection, parsing, and recovery behind a chain API that remains inspectable in ordinary Python.",
+			"An opinionated layer over LangChain LCEL that reduced multi-stage LLM workflow setup from hours to minutes.",
+		lead: "ChainComposer came out of Academic Metrics, where five LLM stages needed structured parsers, fallback paths, and named outputs carried into later prompts. LCEL could express that machinery, but every new workflow meant rebuilding the same construction pattern. ChainComposer kept LCEL underneath and reduced each stage to one declarative call.",
 		year: "2025",
 		status: "shipped",
 		category: "Developer tooling",
@@ -713,10 +744,18 @@ export const projects: readonly Project[] = [
 				href: "https://pypi.org/project/ChainComposer/",
 			},
 		],
+		relatedProjects: [
+			{
+				slug: "academic_metrics",
+				eyebrow: "Production proving ground",
+				detail:
+					"Academic Metrics contains the earlier embedded implementation and the five-stage classifier that motivated the standalone package.",
+			},
+		],
 		facts: [
-			{ label: "Composition", value: "Ordered, multi-layer chains" },
-			{ label: "Outputs", value: "JSON, strings, and Pydantic" },
-			{ label: "Execution", value: "Sync and async paths" },
+			{ label: "Era", value: "LangChain 0.3 / LCEL" },
+			{ label: "Authoring", value: "Hours → ~5 minutes" },
+			{ label: "Runtime", value: "LCEL Runnable pipelines" },
 		],
 		flow: [
 			"Input state",
@@ -730,11 +769,73 @@ export const projects: readonly Project[] = [
 			alt: "ChainComposer wordmark over a connected-node background",
 			fit: "cover",
 		},
+		codeComparison: {
+			eyebrow: "Before / after",
+			title: "The abstraction was the product.",
+			description:
+				"LCEL could express every step. The recurring cost was constructing and debugging the same prompt, parser, fallback, and state machinery before building the actual workflow. ChainComposer paid that cost once; scaling the pattern across Academic Metrics' five LLM stages became layer declarations.",
+			samples: [
+				{
+					label: "Raw LCEL",
+					title: "Build the machinery first",
+					detail:
+						"This is the compact version for one intermediate stage. Reusing it cleanly means extracting another helper—which is already the beginning of an orchestration library.",
+					code: [
+						"prompt = ChatPromptTemplate.from_messages([",
+						'    ("system", METHOD_EXTRACTION_SYSTEM_MESSAGE),',
+						'    ("human", HUMAN_MESSAGE_PROMPT),',
+						"])",
+						"",
+						"primary = (",
+						"    prompt",
+						"    | llm",
+						"    | JsonOutputParser(",
+						"        pydantic_object=MethodExtractionOutput,",
+						"    )",
+						")",
+						"fallback = prompt | llm | StrOutputParser()",
+						"",
+						"method_layer = primary.with_fallbacks(",
+						"    [fallback],",
+						"    exceptions_to_handle=PARSE_ERRORS,",
+						")",
+						"pipeline = RunnablePassthrough.assign(",
+						"    method_json_output=method_layer,",
+						")",
+						"state = pipeline.invoke(inputs)",
+					].join("\n"),
+				},
+				{
+					label: "ChainComposer",
+					title: "Declare the workflow",
+					detail:
+						"Prompt construction, parser policy, the fallback path, and the named state handoff become one layer contract. Additional stages use the same call.",
+					code: [
+						"composer = ChainComposer(",
+						'    model="gpt-4o-mini",',
+						"    api_key=api_key,",
+						")",
+						"",
+						"composer.add_chain_layer(",
+						"    system_prompt=METHOD_EXTRACTION_SYSTEM_MESSAGE,",
+						"    human_prompt=HUMAN_MESSAGE_PROMPT,",
+						'    parser_type="json",',
+						'    fallback_parser_type="str",',
+						"    pydantic_output_model=MethodExtractionOutput,",
+						'    output_passthrough_key_name="method_json_output",',
+						")",
+						"",
+						"state = composer.run(inputs)",
+					].join("\n"),
+				},
+			],
+		},
 		sections: [
 			{
-				title: "The repeated problem",
+				title: "Why it existed",
 				paragraphs: [
-					"Multi-step LLM applications repeatedly need the same glue: prompt templates, output parsing, state transfer, retries, rate limits, logging, and provider setup. Academic Metrics had enough of that machinery to justify pulling it into a standalone library.",
+					"Academic Metrics was not a toy example bolted on after the fact. Its classifier was the original proving ground: method extraction, sentence analysis, summarization, recursive taxonomy classification, and theme recognition run across three managers with outputs carried forward by name.",
+					"LangChain 0.3's LCEL supplied expressive prompt, model, parser, and Runnable primitives. It did not supply this opinionated application pattern. Once I extracted that repeated construction into ChainComposer, assembling a new multi-stage workflow went from hours of wiring and debugging to roughly five minutes of declaring layers.",
 				],
 			},
 			{
@@ -752,23 +853,23 @@ export const projects: readonly Project[] = [
 		],
 		decisions: [
 			{
-				title: "Keep composition linear",
+				title: "Wrap LCEL, do not replace it",
 				detail:
-					"The API makes layer ordering and variable handoff visible rather than hiding control flow in a graph runtime.",
+					"Every layer still compiles to ordinary Runnable pipelines; the library removes repeated construction without inventing another execution engine.",
+			},
+			{
+				title: "Name every handoff",
+				detail:
+					"Each output enters shared state under an explicit key, so the next prompt's inputs remain visible and inspectable.",
 			},
 			{
 				title: "Treat parsers as policy",
 				detail:
-					"Output format, validation, and fallback behavior are configured per layer instead of scattered through prompts.",
-			},
-			{
-				title: "Keep providers replaceable",
-				detail:
-					"OpenAI, Anthropic, and Google-backed layers share the same composition model.",
+					"Output format, validation, and fallback behavior are configured per layer instead of being scattered through control flow.",
 			},
 		],
 		outcome:
-			"A published package that separated reusable LLM workflow machinery from the research application that originally needed it.",
+			"A PyPI package extracted from a working classifier that reduced my repeat pipeline setup from hours to roughly five minutes while leaving LCEL visible underneath.",
 	},
 	{
 		slug: "saltcast",

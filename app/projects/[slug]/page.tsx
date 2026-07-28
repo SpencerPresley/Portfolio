@@ -229,6 +229,122 @@ export default async function ProjectPage({ params }: Props) {
 					</div>
 				</div>
 
+				{project.codeComparison ? (
+					<section
+						data-code-comparison="true"
+						className="border-t border-zinc-800 py-20"
+						aria-labelledby={`${project.slug}-code-comparison`}
+					>
+						<div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_32rem] lg:items-end">
+							<div className="max-w-3xl">
+								<p
+									className={`font-mono text-xs uppercase tracking-[0.2em] ${accent.text}`}
+								>
+									{project.codeComparison.eyebrow}
+								</p>
+								<h2
+									id={`${project.slug}-code-comparison`}
+									className="mt-4 font-display text-3xl leading-tight text-white sm:text-4xl"
+								>
+									{project.codeComparison.title}
+								</h2>
+							</div>
+							<p className="text-sm leading-7 text-zinc-500">
+								{project.codeComparison.description}
+							</p>
+						</div>
+
+						<div className="mt-10 grid gap-5 lg:grid-cols-2">
+							{project.codeComparison.samples.map((sample, index) => (
+								<article
+									key={sample.label}
+									className={`min-w-0 overflow-hidden rounded-2xl border ${
+										index === 0 ? "border-zinc-800" : accent.border
+									} bg-zinc-900/45`}
+								>
+									<div className="p-6 sm:p-7">
+										<p
+											className={`font-mono text-[0.65rem] uppercase tracking-[0.18em] ${
+												index === 0 ? "text-zinc-500" : accent.text
+											}`}
+										>
+											{sample.label}
+										</p>
+										<h3 className="mt-4 text-lg font-semibold text-zinc-100">
+											{sample.title}
+										</h3>
+										<p className="mt-3 text-sm leading-7 text-zinc-500">
+											{sample.detail}
+										</p>
+									</div>
+									<pre className="max-w-full overflow-x-auto border-t border-zinc-800 bg-zinc-950/80 p-5 font-mono text-[0.72rem] leading-6 text-zinc-300 sm:p-7 sm:text-xs">
+										<code>{sample.code}</code>
+									</pre>
+								</article>
+							))}
+						</div>
+					</section>
+				) : null}
+
+				{project.relatedProjects?.length ? (
+					<section
+						className="border-t border-zinc-800 py-16"
+						aria-labelledby={`${project.slug}-related-projects`}
+					>
+						<p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-zinc-600">
+							Connected work
+						</p>
+						<h2
+							id={`${project.slug}-related-projects`}
+							className="mt-4 font-display text-3xl leading-tight text-white"
+						>
+							Follow the implementation thread.
+						</h2>
+
+						<div className="mt-8 grid gap-4 sm:grid-cols-2">
+							{project.relatedProjects.map((relationship) => {
+								const relatedProject = getProject(relationship.slug);
+
+								if (!relatedProject) {
+									return null;
+								}
+
+								const relatedAccent =
+									projectAccentStyles[relatedProject.accent];
+
+								return (
+									<Link
+										key={relationship.slug}
+										href={`/projects/${relatedProject.slug}`}
+										data-related-project={relatedProject.slug}
+										className="group rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 transition hover:border-zinc-600 hover:bg-zinc-900/65 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-4 focus:ring-offset-zinc-950"
+									>
+										<p
+											className={`font-mono text-[0.65rem] uppercase tracking-[0.18em] ${relatedAccent.text}`}
+										>
+											{relationship.eyebrow}
+										</p>
+										<div className="mt-4 flex items-start justify-between gap-5">
+											<div>
+												<h3 className="font-display text-2xl text-zinc-100 transition group-hover:text-white">
+													{relatedProject.title}
+												</h3>
+												<p className="mt-3 text-sm leading-7 text-zinc-500 transition group-hover:text-zinc-400">
+													{relationship.detail}
+												</p>
+											</div>
+											<ArrowRight
+												className="mt-1 h-4 w-4 shrink-0 text-zinc-600 transition group-hover:translate-x-1 group-hover:text-zinc-300"
+												aria-hidden="true"
+											/>
+										</div>
+									</Link>
+								);
+							})}
+						</div>
+					</section>
+				) : null}
+
 				<section
 					className="border-y border-zinc-800 py-16"
 					aria-labelledby="decisions"

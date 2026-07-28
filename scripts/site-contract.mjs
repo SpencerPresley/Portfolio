@@ -44,6 +44,21 @@ function headerAnchors(html) {
 	);
 }
 
+function mainContent(html) {
+	const main = html.match(/<main\b[\s\S]*?<\/main>/i);
+	assert.ok(main, "rendered page must contain the project content");
+	return main[0];
+}
+
+function relatedProjectAnchors(html) {
+	return [...html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)]
+		.filter((match) => attribute(match[1], "data-related-project"))
+		.map((match) => ({
+			href: attribute(match[1], "href"),
+			project: attribute(match[1], "data-related-project"),
+		}));
+}
+
 async function renderedPage(pathname) {
 	const response = await fetch(new URL(pathname, baseUrl));
 	assert.equal(
@@ -102,7 +117,74 @@ async function navigationSuite() {
 	}
 }
 
+async function chainComposerSuite() {
+	const chainComposerHtml = await renderedPage("/projects/chain_composer");
+	const chainComposerContent = mainContent(chainComposerHtml);
+	const chainComposerText = visibleText(chainComposerContent);
+	const academicMetricsHtml = await renderedPage("/projects/academic_metrics");
+	const academicMetricsContent = mainContent(academicMetricsHtml);
+	const academicMetricsText = visibleText(academicMetricsContent);
+
+	assert.ok(
+		chainComposerContent.includes('data-code-comparison="true"'),
+		"ChainComposer must render the LCEL code-comparison surface",
+	);
+	for (const expected of [
+		"Raw LCEL",
+		"ChainComposer",
+		"RunnablePassthrough.assign",
+		"with_fallbacks",
+		"add_chain_layer",
+		"Hours",
+		"~5 minutes",
+	]) {
+		assert.ok(
+			chainComposerText.includes(expected),
+			`ChainComposer must explain ${expected}`,
+		);
+	}
+	assert.deepEqual(
+		relatedProjectAnchors(chainComposerContent),
+		[
+			{
+				href: "/projects/academic_metrics",
+				project: "academic_metrics",
+			},
+		],
+		"ChainComposer must render Academic Metrics in its connected-work surface",
+	);
+	assert.deepEqual(
+		relatedProjectAnchors(academicMetricsContent),
+		[
+			{
+				href: "/projects/chain_composer",
+				project: "chain_composer",
+			},
+		],
+		"Academic Metrics must render ChainComposer in its connected-work surface",
+	);
+	assert.match(
+		academicMetricsText,
+		/earlier embedded (version|implementation) of ChainComposer/i,
+		"Academic Metrics must identify its embedded ChainComposer lineage",
+	);
+
+	for (const { label, pattern } of [
+		{ label: "async execution", pattern: /\b(?:async|asynchronous)\b/i },
+		{
+			label: "rate limiting",
+			pattern: /\brate(?:[-\s]+)(?:limit(?:s|ing|ed)?|control)\b/i,
+		},
+	]) {
+		assert.ok(
+			!pattern.test(chainComposerText),
+			`ChainComposer must not claim unsupported ${label}`,
+		);
+	}
+}
+
 const suites = {
+	"chain-composer": chainComposerSuite,
 	navigation: navigationSuite,
 };
 
