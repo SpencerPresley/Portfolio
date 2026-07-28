@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 
-const baseUrl =
-	process.env.PORTFOLIO_BASE_URL ?? "http://127.0.0.1:3100";
+const baseUrl = process.env.PORTFOLIO_BASE_URL ?? "http://127.0.0.1:3100";
 const suite = process.argv[2];
 
 function decodeHtml(value) {
@@ -22,9 +22,7 @@ function visibleText(fragment) {
 }
 
 function attribute(attributes, name) {
-	const match = attributes.match(
-		new RegExp(`(?:^|\\s)${name}="([^"]*)"`, "i"),
-	);
+	const match = attributes.match(new RegExp(`(?:^|\\s)${name}="([^"]*)"`, "i"));
 	return match?.[1];
 }
 
@@ -37,9 +35,7 @@ function headerAnchors(html) {
 			href: attribute(match[1], "href"),
 			current: attribute(match[1], "aria-current"),
 			label: visibleText(match[2]),
-			hasActiveIndicator: match[2].includes(
-				'data-active-indicator="true"',
-			),
+			hasActiveIndicator: match[2].includes('data-active-indicator="true"'),
 		}),
 	);
 }
@@ -69,6 +65,116 @@ async function renderedPage(pathname) {
 	return response.text();
 }
 
+async function renderedAsset(pathname) {
+	const response = await fetch(new URL(pathname, baseUrl));
+	assert.equal(
+		response.status,
+		200,
+		`${pathname} must load successfully, received ${response.status}`,
+	);
+	assert.equal(
+		response.headers.get("content-type"),
+		"image/png",
+		`${pathname} must remain a PNG`,
+	);
+	return Buffer.from(await response.arrayBuffer());
+}
+
+function pngDimensions(bytes) {
+	assert.equal(
+		bytes.subarray(1, 4).toString("ascii"),
+		"PNG",
+		"asset must contain a PNG signature",
+	);
+	return {
+		width: bytes.readUInt32BE(16),
+		height: bytes.readUInt32BE(20),
+	};
+}
+
+async function brandingSuite() {
+	const html = await renderedPage("/");
+	const legacyTemplateName = ["chrono", "ark"].join("");
+	assert.doesNotMatch(
+		html,
+		new RegExp(legacyTemplateName, "i"),
+		"rendered metadata must not preserve legacy template branding",
+	);
+	assert.ok(
+		html.includes(
+			'<meta property="og:image" content="https://spencerpresley.com/spencer-presley-og.png"',
+		),
+		"Home must publish the Spencer-branded Open Graph image",
+	);
+	assert.ok(
+		html.includes(
+			'<meta name="twitter:image" content="https://spencerpresley.com/spencer-presley-og.png"',
+		),
+		"Home must publish the Spencer-branded Twitter image",
+	);
+	assert.ok(
+		html.includes(
+			'<meta property="og:image:alt" content="Spencer Presley — AI and backend systems"',
+		),
+		"Social previews must describe the branded image",
+	);
+	assert.ok(
+		html.includes(
+			'<meta name="twitter:image:alt" content="Spencer Presley — AI and backend systems"',
+		),
+		"Twitter previews must describe the branded image",
+	);
+	for (const relationship of ["shortcut icon", "icon", "apple-touch-icon"]) {
+		assert.ok(
+			html.includes(
+				`<link rel="${relationship}" href="/spencer-presley-icon.png"`,
+			),
+			`${relationship} must reference the Spencer-branded icon`,
+		);
+	}
+	assert.ok(
+		!html.includes('content="https://spencerpresley.com/og.png"') &&
+			!html.includes('href="/favicon.png"'),
+		"rendered metadata must not reference the legacy asset URLs",
+	);
+
+	for (const expected of [
+		{
+			pathname: "/spencer-presley-og.png",
+			legacyHash:
+				"41f042a04511ab9f773743c3d1b138db4f845df81b1bf369fdf5a74562f19162",
+			dimensions: { width: 1200, height: 630 },
+		},
+		{
+			pathname: "/spencer-presley-icon.png",
+			legacyHash:
+				"9591ef7ba4d337850540c328f4aa94ca7ddab187e2dbe8c217e255455eac263d",
+			dimensions: { width: 512, height: 512 },
+		},
+	]) {
+		const bytes = await renderedAsset(expected.pathname);
+		assert.notEqual(
+			createHash("sha256").update(bytes).digest("hex"),
+			expected.legacyHash,
+			`${expected.pathname} must not reuse the legacy template asset`,
+		);
+		assert.deepEqual(
+			pngDimensions(bytes),
+			expected.dimensions,
+			`${expected.pathname} must use its intended social or icon dimensions`,
+		);
+	}
+
+	for (const pathname of ["/og.png", "/favicon.png"]) {
+		const response = await fetch(new URL(pathname, baseUrl));
+		assert.equal(
+			response.status,
+			404,
+			`${pathname} must not preserve the legacy template asset`,
+		);
+	}
+}
+
 async function navigationSuite() {
 	const cases = [
 		{ pathname: "/", current: "Spencer Presley", indicator: false },
@@ -80,12 +186,7 @@ async function navigationSuite() {
 			indicator: true,
 		},
 	];
-	const expectedLabels = [
-		"Spencer Presley",
-		"Projects",
-		"Contact",
-		"Resume",
-	];
+	const expectedLabels = ["Spencer Presley", "Projects", "Contact", "Resume"];
 	const expectedHrefs = ["/", "/projects", "/contact", "/resume"];
 
 	for (const testCase of cases) {
@@ -101,9 +202,7 @@ async function navigationSuite() {
 			`${testCase.pathname} must preserve stable destinations`,
 		);
 
-		const current = anchors.filter(
-			(anchor) => anchor.current === "page",
-		);
+		const current = anchors.filter((anchor) => anchor.current === "page");
 		assert.deepEqual(
 			current.map((anchor) => anchor.label),
 			[testCase.current],
@@ -186,9 +285,7 @@ async function chainComposerSuite() {
 async function contactSuite() {
 	const contactHtml = await renderedPage("/contact");
 	const contactContent = mainContent(contactHtml);
-	const methods = [
-		...contactContent.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi),
-	]
+	const methods = [...contactContent.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)]
 		.filter((match) => attribute(match[1], "data-contact-method"))
 		.map((match) => ({
 			method: attribute(match[1], "data-contact-method"),
@@ -228,7 +325,9 @@ async function contactSuite() {
 	);
 	assert.ok(email, "Contact must expose its responsive email treatment");
 
-	const classNames = attribute(`${email[1]} ${email[2]}`, "class")?.split(/\s+/);
+	const classNames = attribute(`${email[1]} ${email[2]}`, "class")?.split(
+		/\s+/,
+	);
 	assert.ok(
 		classNames?.includes("whitespace-nowrap"),
 		"Contact email must stay on one line",
@@ -308,11 +407,9 @@ async function atlasConnectSuite() {
 		assert.ok(text.includes(expected), `AtlasConnect must explain ${expected}`);
 	}
 	assert.deepEqual(
-		[
-			...content.matchAll(
-				/data-atlasconnect-stage="([^"]+)"/gi,
-			),
-		].map((match) => match[1]),
+		[...content.matchAll(/data-atlasconnect-stage="([^"]+)"/gi)].map(
+			(match) => match[1],
+		),
 		["01", "02", "03", "04"],
 		"AtlasConnect must render its four process stages in order",
 	);
@@ -367,20 +464,14 @@ async function previewsSuite() {
 		"Home must preserve its CrunchAtlas, gloss, and Celery proof order",
 	);
 	assert.deepEqual(
-		[
-			...projects.matchAll(/data-professional-work-card="([^"]+)"/gi),
-		].map((match) => match[1]),
+		[...projects.matchAll(/data-professional-work-card="([^"]+)"/gi)].map(
+			(match) => match[1],
+		),
 		["crunchatlas", "atlasconnect"],
 		"Projects must render both professional case studies in canonical order",
 	);
 
-	for (const {
-		content,
-		marker,
-		slug,
-		internal,
-		external,
-	} of [
+	for (const { content, marker, slug, internal, external } of [
 		{
 			content: home,
 			marker: "data-home-professional-work",
@@ -428,6 +519,7 @@ async function previewsSuite() {
 
 const suites = {
 	atlasconnect: atlasConnectSuite,
+	branding: brandingSuite,
 	"chain-composer": chainComposerSuite,
 	contact: contactSuite,
 	crunchatlas: crunchAtlasSuite,
