@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { HomeProfessionalWork } from "./components/home-professional-work";
 import { HomeProjectProof } from "./components/home-project-proof";
 import { Navigation } from "./components/nav";
 import {
@@ -8,6 +8,7 @@ import {
 	pageAtmosphereStyles,
 } from "./components/page-atmosphere";
 import { getProject } from "./projects/project-data";
+import { professionalWork } from "./projects/professional-work-data";
 
 const homeAtmosphere = pageAtmosphereStyles.home;
 
@@ -79,54 +80,7 @@ export default function Home() {
 						<div className="h-px flex-1 bg-zinc-800" aria-hidden="true" />
 					</div>
 
-					<article className="grid overflow-hidden rounded-3xl border border-amber-400/20 bg-zinc-900/55 lg:grid-cols-[1.1fr_0.9fr]">
-						<div className="relative min-h-[18rem] overflow-hidden border-b border-zinc-800 bg-zinc-950 lg:min-h-full lg:border-b-0 lg:border-r">
-							<Image
-								src="/projects/crunchatlas-campaign-teaser.webp"
-								alt="Redacted CrunchAtlas marketing view showing an active network security campaign summary"
-								fill
-								priority
-								sizes="(max-width: 1024px) 100vw, 55vw"
-								className="object-cover"
-							/>
-							<div
-								className="pointer-events-none absolute inset-0 bg-gradient-to-t from-zinc-950/75 via-transparent to-transparent"
-								aria-hidden="true"
-							/>
-							<span className="absolute left-5 top-5 rounded-full border border-white/10 bg-zinc-950/80 px-3 py-1.5 font-mono text-[0.62rem] uppercase tracking-[0.16em] text-zinc-300 backdrop-blur">
-								Public marketing image
-							</span>
-						</div>
-
-						<div className="flex flex-col p-7 sm:p-9">
-							<p className="font-mono text-[0.68rem] uppercase tracking-[0.2em] text-amber-300">
-								Current work · 2025–
-							</p>
-							<h3 className="mt-4 font-display text-3xl leading-tight text-white sm:text-4xl">
-								CrunchAtlas / AtlasCyber
-							</h3>
-							<p className="mt-5 text-sm leading-7 text-zinc-400 sm:text-[0.95rem]">
-								At CrunchAtlas, I build the AI and backend infrastructure for
-								AtlasCyber: evidence-grounded network analysis agents, the agent
-								runtime and sandboxing layer, Postgres-native job and GPU
-								orchestration, and local model serving across cloud, on-prem, and
-								air-gapped environments.
-							</p>
-							<p className="mt-3 text-xs leading-6 text-zinc-600">
-								The image is intentionally redacted; it marks the boundary of
-								what I show publicly.
-							</p>
-							<a
-								href="https://www.crunchatlas.com/"
-								target="_blank"
-								rel="noreferrer"
-								className="mt-7 inline-flex w-fit items-center gap-2 text-sm font-medium text-amber-300 transition hover:text-amber-200 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-4 focus:ring-offset-zinc-950"
-							>
-								Visit CrunchAtlas
-								<ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-							</a>
-						</div>
-					</article>
+					<HomeProfessionalWork work={professionalWork.crunchatlas} />
 
 					<div className="mt-5 divide-y divide-zinc-800 overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900/30">
 						{homepageProjects.map((project, index) => (
@@ -148,8 +102,9 @@ export default function Home() {
 							<h2 className="mt-4 max-w-2xl font-display text-3xl leading-tight text-white sm:text-4xl">
 								Want to talk through the work?
 							</h2>
-							<p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-500">
-								Email is the most reliable way to reach me.
+							<p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-400">
+								LinkedIn gives me enough context for a useful first
+								conversation.
 							</p>
 						</div>
 						<Link

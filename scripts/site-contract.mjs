@@ -338,12 +338,101 @@ async function atlasConnectSuite() {
 	);
 }
 
+async function previewsSuite() {
+	const home = mainContent(await renderedPage("/"));
+	const projects = mainContent(await renderedPage("/projects"));
+	const homeText = visibleText(home);
+	const anchorHrefs = (content) =>
+		[...content.matchAll(/<a\b([^>]*)>/gi)].map((match) =>
+			attribute(match[1], "href"),
+		);
+	const markedArticle = (content, marker, slug) => {
+		const article = content.match(
+			new RegExp(
+				`<article\\b[^>]*\\b${marker}="${slug}"[^>]*>[\\s\\S]*?<\\/article>`,
+				"i",
+			),
+		);
+		assert.ok(article, `${marker}="${slug}" must mark an article`);
+		return article[0];
+	};
+
+	assert.deepEqual(
+		[
+			...home.matchAll(
+				/data-(?:home-professional-work|home-project)="([^"]+)"/gi,
+			),
+		].map((match) => match[1]),
+		["crunchatlas", "gloss", "celery-fork-safety"],
+		"Home must preserve its CrunchAtlas, gloss, and Celery proof order",
+	);
+	assert.deepEqual(
+		[
+			...projects.matchAll(/data-professional-work-card="([^"]+)"/gi),
+		].map((match) => match[1]),
+		["crunchatlas", "atlasconnect"],
+		"Projects must render both professional case studies in canonical order",
+	);
+
+	for (const {
+		content,
+		marker,
+		slug,
+		internal,
+		external,
+	} of [
+		{
+			content: home,
+			marker: "data-home-professional-work",
+			slug: "crunchatlas",
+			internal: "/projects/crunchatlas",
+			external: "https://www.crunchatlas.com/",
+		},
+		{
+			content: projects,
+			marker: "data-professional-work-card",
+			slug: "crunchatlas",
+			internal: "/projects/crunchatlas",
+			external: "https://www.crunchatlas.com/",
+		},
+		{
+			content: projects,
+			marker: "data-professional-work-card",
+			slug: "atlasconnect",
+			internal: "/projects/atlasconnect",
+			external: "https://www.pitchfire.com/",
+		},
+	]) {
+		assert.deepEqual(
+			[...new Set(anchorHrefs(markedArticle(content, marker, slug)))],
+			[internal, external],
+			`${slug} must pair its case study with its own external product`,
+		);
+	}
+	assert.ok(
+		!home.includes("crunchatlas-campaign-teaser.webp") &&
+			!projects.includes("crunchatlas-campaign-teaser.webp"),
+		"Professional previews must not reference the stale teaser asset",
+	);
+	assert.ok(
+		homeText.includes(
+			"LinkedIn gives me enough context for a useful first conversation.",
+		),
+		"Home must agree with the LinkedIn-first contact path",
+	);
+	assert.ok(
+		!homeText.includes("Email is the most reliable way to reach me."),
+		"Home must not preserve its stale email-first contact claim",
+	);
+}
+
 const suites = {
 	atlasconnect: atlasConnectSuite,
 	"chain-composer": chainComposerSuite,
 	contact: contactSuite,
 	crunchatlas: crunchAtlasSuite,
 	navigation: navigationSuite,
+	previews: previewsSuite,
 };
 
 assert.ok(

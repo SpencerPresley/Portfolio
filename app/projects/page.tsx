@@ -1,10 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
 import {
 	ArrowRight,
 	ArrowUpRight,
 	Braces,
-	Briefcase,
 	Database,
 	GitPullRequest,
 	Network,
@@ -16,6 +14,8 @@ import {
 } from "../components/page-atmosphere";
 import { openSourceContributions, projects } from "./project-data";
 import { ProjectCard } from "./project-ui";
+import { ProfessionalWorkCard } from "./professional-work-card";
+import { professionalWorkList } from "./professional-work-data";
 
 export const metadata = {
 	title: "Projects",
@@ -114,117 +114,13 @@ export default function ProjectsPage() {
 					</div>
 
 					<div className="grid gap-5 lg:grid-cols-2">
-						<article className="overflow-hidden rounded-3xl border border-amber-400/20 bg-zinc-900/55">
-							<div className="relative aspect-video overflow-hidden border-b border-zinc-800 bg-zinc-950">
-								<Image
-									src="/projects/crunchatlas-campaign-teaser.webp"
-									alt="Redacted CrunchAtlas marketing view showing an active network security campaign summary"
-									fill
-									priority
-									sizes="(max-width: 1024px) 100vw, 50vw"
-									className="object-cover"
-								/>
-								<div
-									className="pointer-events-none absolute inset-0 bg-gradient-to-t from-zinc-950/75 via-transparent to-transparent"
-									aria-hidden="true"
-								/>
-								<span className="absolute left-5 top-5 rounded-full border border-white/10 bg-zinc-950/80 px-3 py-1.5 font-mono text-[0.62rem] uppercase tracking-[0.16em] text-zinc-300 backdrop-blur">
-									Public marketing image
-								</span>
-							</div>
-
-							<div className="p-7 sm:p-8">
-								<p className="font-mono text-[0.68rem] uppercase tracking-[0.2em] text-amber-300">
-									Current work · 2025–
-								</p>
-								<h3 className="mt-4 font-display text-3xl leading-tight text-white sm:text-4xl">
-									CrunchAtlas / AtlasCyber
-								</h3>
-								<p className="mt-5 text-sm leading-7 text-zinc-400 sm:text-[0.95rem]">
-									At CrunchAtlas, I build the AI and backend infrastructure for
-									AtlasCyber, a local-first security platform: evidence-grounded
-									network analysis agents, the agent runtime and sandboxing
-									layer, Postgres-native job and GPU orchestration, and local
-									model serving. It runs in cloud, on-prem, and air-gapped
-									environments; this deliberately redacted marketing image is
-									the boundary of what I show publicly.
-								</p>
-								<a
-									href="https://www.crunchatlas.com/"
-									target="_blank"
-									rel="noreferrer"
-									className="mt-7 inline-flex items-center gap-2 text-sm font-medium text-amber-300 transition hover:text-amber-200 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-4 focus:ring-offset-zinc-950"
-								>
-									Visit CrunchAtlas
-									<ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-								</a>
-							</div>
-						</article>
-
-						<article className="relative overflow-hidden rounded-3xl border border-sky-400/20 bg-zinc-900/55 p-7 sm:p-8">
-							<div
-								className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(14,165,233,0.17),transparent_42%),radial-gradient(circle_at_100%_100%,rgba(124,58,237,0.13),transparent_38%)]"
-								aria-hidden="true"
+						{professionalWorkList.map((work, index) => (
+							<ProfessionalWorkCard
+								key={work.slug}
+								work={work}
+								priority={index === 0}
 							/>
-							<div className="relative flex h-full flex-col">
-								<div className="flex items-center gap-3 border-b border-zinc-700/70 pb-5">
-									<span className="flex h-10 w-10 items-center justify-center rounded-xl border border-sky-400/20 bg-sky-400/10 text-sky-300">
-										<Briefcase className="h-4 w-4" aria-hidden="true" />
-									</span>
-									<span>
-										<span className="block text-sm font-medium text-zinc-200">
-											AtlasConnect · 2025
-										</span>
-										<span className="mt-0.5 block font-mono text-[0.62rem] uppercase tracking-[0.16em] text-zinc-600">
-											Private production work
-										</span>
-									</span>
-								</div>
-
-								<h3 className="mt-7 font-display text-3xl leading-tight text-white sm:text-4xl">
-									The product is now Pitchfire.
-								</h3>
-								<p className="mt-5 text-sm leading-7 text-zinc-400 sm:text-[0.95rem]">
-									At AtlasConnect, I was the sole developer and maintainer of an
-									inherited Django and React product. The multi-format
-									pitch-deck ingestion, AI deal research and memo generation,
-									thesis-match scoring, and firm workflow now marketed as
-									Pitchfire are systems I built and operated there.
-								</p>
-
-								<div className="my-7 grid gap-2.5">
-									{[
-										"Pitch deck ingestion",
-										"Native extraction + OCR",
-										"Parallel AI research",
-										"Firm-fit scoring",
-										"Deal workflow",
-									].map((step, index) => (
-										<div
-											key={step}
-											className="grid grid-cols-[1.75rem_minmax(0,1fr)] items-center gap-3"
-										>
-											<span className="font-mono text-[0.62rem] text-sky-400/70">
-												{String(index + 1).padStart(2, "0")}
-											</span>
-											<span className="rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-xs text-zinc-400">
-												{step}
-											</span>
-										</div>
-									))}
-								</div>
-
-								<a
-									href="https://www.pitchfire.com/"
-									target="_blank"
-									rel="noreferrer"
-									className="mt-auto inline-flex w-fit items-center gap-2 text-sm font-medium text-sky-300 transition hover:text-sky-200 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-4 focus:ring-offset-zinc-950"
-								>
-									See Pitchfire
-									<ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-								</a>
-							</div>
-						</article>
+						))}
 					</div>
 				</section>
 
