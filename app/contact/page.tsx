@@ -56,7 +56,7 @@ export default function ContactPage() {
 
 					<a
 						href={`mailto:${siteContact.email}`}
-						className="group grid gap-6 rounded-3xl border border-sky-400/20 bg-zinc-900/55 p-7 transition hover:border-sky-300/40 hover:bg-zinc-900/75 focus:outline-none focus:ring-2 focus:ring-sky-400 sm:p-10 lg:grid-cols-[3rem_minmax(0,1fr)_auto] lg:items-center"
+						className="group grid gap-6 rounded-3xl border border-sky-400/20 bg-zinc-900/55 p-6 transition hover:border-sky-300/40 hover:bg-zinc-900/75 focus:outline-none focus:ring-2 focus:ring-sky-400 sm:p-10 lg:grid-cols-[3rem_minmax(0,1fr)_auto] lg:items-center"
 					>
 						<span className="flex h-12 w-12 items-center justify-center rounded-2xl border border-sky-400/20 bg-sky-400/10 text-sky-300">
 							<Mail className="h-5 w-5" aria-hidden="true" />
@@ -65,7 +65,10 @@ export default function ContactPage() {
 							<span className="block font-mono text-[0.68rem] uppercase tracking-[0.2em] text-sky-300">
 								Email me
 							</span>
-							<span className="mt-3 block break-all font-display text-2xl leading-tight text-white sm:text-4xl">
+							<span
+								data-contact-email="true"
+								className="mt-3 block whitespace-nowrap font-display text-[clamp(1rem,5vw,1.5rem)] leading-tight text-white sm:text-4xl"
+							>
 								{siteContact.email}
 							</span>
 						</span>

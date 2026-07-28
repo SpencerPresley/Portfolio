@@ -183,8 +183,33 @@ async function chainComposerSuite() {
 	}
 }
 
+async function contactSuite() {
+	const contactHtml = await renderedPage("/contact");
+	const contactContent = mainContent(contactHtml);
+	const email = contactContent.match(
+		/<span\b([^>]*)data-contact-email="true"([^>]*)>/i,
+	);
+
+	assert.ok(email, "Contact must expose its responsive email treatment");
+
+	const classNames = attribute(`${email[1]} ${email[2]}`, "class")?.split(/\s+/);
+	assert.ok(
+		classNames?.includes("whitespace-nowrap"),
+		"Contact email must stay on one line",
+	);
+	assert.ok(
+		classNames?.includes("text-[clamp(1rem,5vw,1.5rem)]"),
+		"Contact email must use the compact fluid mobile size",
+	);
+	assert.ok(
+		!classNames?.includes("break-all"),
+		"Contact email must not split at arbitrary characters",
+	);
+}
+
 const suites = {
 	"chain-composer": chainComposerSuite,
+	contact: contactSuite,
 	navigation: navigationSuite,
 };
 
