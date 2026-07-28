@@ -15,11 +15,6 @@ export const metadata: Metadata = {
 const contactAtmosphere = pageAtmosphereStyles.contact;
 
 export default function ContactPage() {
-	const profiles = [
-		{ icon: Github, ...siteContact.github },
-		{ icon: Linkedin, ...siteContact.linkedin },
-	];
-
 	return (
 		<div className="relative min-h-screen overflow-hidden bg-zinc-950 text-zinc-100">
 			<PageAtmosphere variant="contact" />
@@ -44,8 +39,9 @@ export default function ContactPage() {
 						Let's talk.
 					</h1>
 					<p className="mt-7 max-w-2xl text-base leading-8 text-zinc-400 sm:text-lg">
-						Email is the best way to reach me. You can also find my public
-						work on GitHub and connect on LinkedIn.
+						LinkedIn is the best place to start. It gives me context on who you
+						are and what you're working on before we talk. Email is there when a
+						direct note makes more sense.
 					</p>
 				</header>
 
@@ -55,21 +51,26 @@ export default function ContactPage() {
 					</h2>
 
 					<a
-						href={`mailto:${siteContact.email}`}
+						href={siteContact.linkedin.href}
+						target="_blank"
+						rel="noreferrer"
+						data-contact-method="linkedin"
+						data-primary-contact="true"
 						className="group grid gap-6 rounded-3xl border border-sky-400/20 bg-zinc-900/55 p-6 transition hover:border-sky-300/40 hover:bg-zinc-900/75 focus:outline-none focus:ring-2 focus:ring-sky-400 sm:p-10 lg:grid-cols-[3rem_minmax(0,1fr)_auto] lg:items-center"
 					>
 						<span className="flex h-12 w-12 items-center justify-center rounded-2xl border border-sky-400/20 bg-sky-400/10 text-sky-300">
-							<Mail className="h-5 w-5" aria-hidden="true" />
+							<Linkedin className="h-5 w-5" aria-hidden="true" />
 						</span>
 						<span>
 							<span className="block font-mono text-[0.68rem] uppercase tracking-[0.2em] text-sky-300">
-								Email me
+								Best first contact
 							</span>
-							<span
-								data-contact-email="true"
-								className="mt-3 block whitespace-nowrap font-display text-[clamp(1rem,5vw,1.5rem)] leading-tight text-white sm:text-4xl"
-							>
-								{siteContact.email}
+							<span className="mt-3 block font-display text-3xl leading-tight text-white sm:text-4xl">
+								Connect on LinkedIn
+							</span>
+							<span className="mt-4 block max-w-2xl text-sm leading-7 text-zinc-400">
+								See my current role and work history, then send a message or
+								connection request.
 							</span>
 						</span>
 						<ArrowUpRight
@@ -79,31 +80,54 @@ export default function ContactPage() {
 					</a>
 
 					<div className="mt-5 grid gap-5 sm:grid-cols-2">
-						{profiles.map(({ icon: Icon, label, handle, href }) => (
-							<a
-								key={label}
-								href={href}
-								target="_blank"
-								rel="noreferrer"
-								className="group flex items-center gap-5 rounded-3xl border border-zinc-800 bg-zinc-900/35 p-6 transition hover:-translate-y-1 hover:border-zinc-600 hover:bg-zinc-900/60 focus:outline-none focus:ring-2 focus:ring-violet-400 sm:p-8"
-							>
-								<span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-violet-400/20 bg-violet-400/10 text-violet-300">
-									<Icon className="h-5 w-5" aria-hidden="true" />
+						<a
+							href={`mailto:${siteContact.email}`}
+							data-contact-method="email"
+							className="group relative grid gap-5 rounded-3xl border border-zinc-800 bg-zinc-900/35 p-6 transition hover:-translate-y-1 hover:border-sky-400/40 hover:bg-zinc-900/60 focus:outline-none focus:ring-2 focus:ring-sky-400 sm:p-8 lg:grid-cols-[3rem_minmax(0,1fr)_auto] lg:items-center"
+						>
+							<span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-sky-400/20 bg-sky-400/10 text-sky-300">
+								<Mail className="h-5 w-5" aria-hidden="true" />
+							</span>
+							<span className="min-w-0">
+								<span className="block font-mono text-[0.65rem] uppercase tracking-[0.18em] text-zinc-400">
+									Direct fallback
 								</span>
-								<span className="min-w-0">
-									<span className="block font-mono text-[0.65rem] uppercase tracking-[0.18em] text-zinc-600">
-										{label}
-									</span>
-									<span className="mt-2 block truncate text-base font-medium text-zinc-200 transition group-hover:text-white">
-										{handle}
-									</span>
+								<span
+									data-contact-email="true"
+									className="mt-2 block whitespace-nowrap font-display text-[clamp(1rem,5vw,1.25rem)] leading-tight text-zinc-100 transition group-hover:text-white sm:text-base lg:text-xl"
+								>
+									{siteContact.email}
 								</span>
-								<ArrowUpRight
-									className="ml-auto h-4 w-4 shrink-0 text-zinc-600 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-violet-300"
-									aria-hidden="true"
-								/>
-							</a>
-						))}
+							</span>
+							<ArrowUpRight
+								className="absolute right-6 top-6 h-4 w-4 shrink-0 text-zinc-500 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-sky-300 sm:right-8 sm:top-8 lg:static lg:ml-auto"
+								aria-hidden="true"
+							/>
+						</a>
+
+						<a
+							href={siteContact.github.href}
+							target="_blank"
+							rel="noreferrer"
+							data-contact-method="github"
+							className="group relative grid gap-5 rounded-3xl border border-zinc-800 bg-zinc-900/35 p-6 transition hover:-translate-y-1 hover:border-violet-400/40 hover:bg-zinc-900/60 focus:outline-none focus:ring-2 focus:ring-violet-400 sm:p-8 lg:grid-cols-[3rem_minmax(0,1fr)_auto] lg:items-center"
+						>
+							<span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-violet-400/20 bg-violet-400/10 text-violet-300">
+								<Github className="h-5 w-5" aria-hidden="true" />
+							</span>
+							<span className="min-w-0">
+								<span className="block font-mono text-[0.65rem] uppercase tracking-[0.18em] text-zinc-400">
+									Technical profile
+								</span>
+								<span className="mt-2 block text-lg font-medium text-zinc-200 transition group-hover:text-white">
+									{siteContact.github.handle}
+								</span>
+							</span>
+							<ArrowUpRight
+								className="absolute right-6 top-6 h-4 w-4 shrink-0 text-zinc-500 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-violet-300 sm:right-8 sm:top-8 lg:static lg:ml-auto"
+								aria-hidden="true"
+							/>
+						</a>
 					</div>
 				</section>
 			</main>

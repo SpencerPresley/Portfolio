@@ -186,10 +186,46 @@ async function chainComposerSuite() {
 async function contactSuite() {
 	const contactHtml = await renderedPage("/contact");
 	const contactContent = mainContent(contactHtml);
+	const methods = [
+		...contactContent.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi),
+	]
+		.filter((match) => attribute(match[1], "data-contact-method"))
+		.map((match) => ({
+			method: attribute(match[1], "data-contact-method"),
+			href: attribute(match[1], "href"),
+			primary: attribute(match[1], "data-primary-contact"),
+		}));
 	const email = contactContent.match(
 		/<span\b([^>]*)data-contact-email="true"([^>]*)>/i,
 	);
 
+	assert.deepEqual(
+		methods,
+		[
+			{
+				method: "linkedin",
+				href: "https://www.linkedin.com/in/spencerpresley96",
+				primary: "true",
+			},
+			{
+				method: "email",
+				href: "mailto:spencerpresley96@gmail.com",
+				primary: undefined,
+			},
+			{
+				method: "github",
+				href: "https://github.com/SpencerPresley",
+				primary: undefined,
+			},
+		],
+		"Contact must prioritize LinkedIn before its direct and technical fallbacks",
+	);
+	assert.ok(
+		visibleText(contactContent).includes(
+			"LinkedIn is the best place to start.",
+		),
+		"Contact must explain why LinkedIn is the preferred first contact",
+	);
 	assert.ok(email, "Contact must expose its responsive email treatment");
 
 	const classNames = attribute(`${email[1]} ${email[2]}`, "class")?.split(/\s+/);
@@ -198,7 +234,7 @@ async function contactSuite() {
 		"Contact email must stay on one line",
 	);
 	assert.ok(
-		classNames?.includes("text-[clamp(1rem,5vw,1.5rem)]"),
+		classNames?.includes("text-[clamp(1rem,5vw,1.25rem)]"),
 		"Contact email must use the compact fluid mobile size",
 	);
 	assert.ok(
