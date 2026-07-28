@@ -1115,7 +1115,7 @@ const stages = [
 		eyebrow: "Intake",
 		title: "Accept the opportunity through the channel it actually arrived in.",
 		body:
-			"Embedded forms, direct uploads, DocSend imports, and an AWS Lambda email-intake path all converged on the same opportunity workflow. The Lambda source lived outside the application repositories, but I built and operated that path alongside the product.",
+			"Embedded forms, direct uploads, DocSend imports, and an AWS Lambda email-intake path I built and operated all converged on the same opportunity workflow.",
 		detail:
 			"Multiple entry points mattered because a venture workflow cannot require every founder, analyst, or forwarded deck to begin inside one idealized form.",
 	},
@@ -1135,7 +1135,7 @@ const stages = [
 		body:
 			"Firm and opportunity preparation ran concurrently, then fed synthesis, thesis-fit evaluation, market research, and leadership research. Bounded navigation and background execution kept research useful without giving it an unbounded request lifecycle.",
 		detail:
-			"The public case study describes the staged system, not the private scoring prompts, weights, or research instructions.",
+			"The public boundary here is the staged system; private scoring prompts, weights, and research instructions stay out of scope.",
 	},
 	{
 		number: "04",
@@ -1151,11 +1151,14 @@ const stages = [
 export default function AtlasConnectCaseStudy() {
 	return (
 		<CaseStudyShell work={work}>
-			<CaseStudyHero work={work} />
+			<CaseStudyHero
+				work={work}
+				disclosure="This case study covers the workflow and engineering boundaries I can discuss publicly. It omits customer submissions, private prompts, scoring weights, research instructions, and private source code."
+			/>
 
 			<section className="border-b border-zinc-800 py-20" aria-labelledby="atlasconnect-flow">
 				<div className="grid gap-10 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-20">
-					<p className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-600">
+					<p className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-400">
 						01 · System flow
 					</p>
 					<div className="min-w-0 max-w-4xl">
@@ -1187,7 +1190,7 @@ export default function AtlasConnectCaseStudy() {
 						<p className="font-mono text-xs uppercase tracking-[0.2em] text-sky-300">
 							02 · Pipeline
 						</p>
-						<p className="mt-5 text-sm leading-7 text-zinc-500">
+						<p className="mt-5 text-sm leading-7 text-zinc-400">
 							Each stage produced a durable input for the next one and a visible
 							state for the operator.
 						</p>
@@ -1197,6 +1200,7 @@ export default function AtlasConnectCaseStudy() {
 						{stages.map((stage) => (
 							<section
 								key={stage.number}
+								data-atlasconnect-stage={stage.number}
 								aria-labelledby={`atlasconnect-stage-${stage.number}`}
 								className="grid gap-6 border-l border-sky-400/20 pl-6 sm:pl-9"
 							>
@@ -1212,7 +1216,7 @@ export default function AtlasConnectCaseStudy() {
 								<p className="text-[1.02rem] leading-8 text-zinc-400">
 									{stage.body}
 								</p>
-								<p className="rounded-2xl border border-zinc-800 bg-zinc-900/45 p-5 text-sm leading-7 text-zinc-500">
+								<p className="rounded-2xl border border-zinc-800 bg-zinc-900/45 p-5 text-sm leading-7 text-zinc-400">
 									{stage.detail}
 								</p>
 							</section>
@@ -1223,7 +1227,7 @@ export default function AtlasConnectCaseStudy() {
 
 			<section className="border-b border-zinc-800 py-20" aria-labelledby="atlasconnect-decisions">
 				<div className="grid gap-10 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-20">
-					<p className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-600">
+					<p className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-400">
 						03 · Engineering choices
 					</p>
 					<div className="min-w-0 max-w-4xl">

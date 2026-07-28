@@ -286,7 +286,60 @@ async function crunchAtlasSuite() {
 	);
 }
 
+async function atlasConnectSuite() {
+	const html = await renderedPage("/projects/atlasconnect");
+	const content = mainContent(html);
+	const text = visibleText(content);
+
+	assert.ok(
+		html.includes('data-professional-case-study="atlasconnect"'),
+		"AtlasConnect must render through the professional case-study shell",
+	);
+	for (const expected of [
+		"From incoming pitch deck to an investment decision.",
+		"sole developer and maintainer",
+		"inherited",
+		"DocSend",
+		"AWS Lambda",
+		"OCR",
+		"Firm workflow",
+		"Pitchfire",
+	]) {
+		assert.ok(text.includes(expected), `AtlasConnect must explain ${expected}`);
+	}
+	assert.deepEqual(
+		[
+			...content.matchAll(
+				/data-atlasconnect-stage="([^"]+)"/gi,
+			),
+		].map((match) => match[1]),
+		["01", "02", "03", "04"],
+		"AtlasConnect must render its four process stages in order",
+	);
+	assert.ok(
+		!/<img\b/i.test(content),
+		"AtlasConnect must not fabricate or copy a product image",
+	);
+	assert.ok(
+		content.includes('href="https://www.pitchfire.com/"'),
+		"AtlasConnect must link to the rebranded public product",
+	);
+	assert.ok(
+		content.includes('href="/projects/crunchatlas"'),
+		"AtlasConnect must link back to the CrunchAtlas case study",
+	);
+	const canonical = [...html.matchAll(/<link\b([^>]*)>/gi)].find(
+		(match) => attribute(match[1], "rel") === "canonical",
+	);
+	assert.equal(
+		attribute(canonical?.[1] ?? "", "href"),
+		"https://spencerpresley.com/projects/atlasconnect",
+		"AtlasConnect must publish its canonical project URL as a canonical link",
+	);
+}
+
 const suites = {
+	atlasconnect: atlasConnectSuite,
 	"chain-composer": chainComposerSuite,
 	contact: contactSuite,
 	crunchatlas: crunchAtlasSuite,
