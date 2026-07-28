@@ -3,6 +3,9 @@
 Spencer Presley's portfolio, built with Next.js and Tailwind CSS and deployed
 on Vercel.
 
+The durable content, layout, privacy, and verification decisions are documented
+in [`docs/DESIGN.md`](docs/DESIGN.md).
+
 ## Local development
 
 ```sh
@@ -39,7 +42,12 @@ AI/LLM resume the default download.
 
 ## Updating projects
 
-Project metadata and case-study content live in
+Public project metadata and case-study content live in
 `app/projects/project-data.ts`. Each typed record drives both the project index
-and its `/projects/[slug]` detail route; there is no database, CMS, Markdown, or
-generated content layer.
+and its `/projects/[slug]` detail route.
+
+Professional-work summaries live in
+`app/projects/professional-work-data.ts`. CrunchAtlas and AtlasConnect use
+dedicated route components because their evidence and disclosure boundaries
+need different presentations. There is no database, Redis dependency, CMS,
+MDX, or generated content layer.
