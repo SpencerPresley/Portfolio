@@ -20,7 +20,7 @@ export function HomeProjectProof({
 		>
 			<article className="grid gap-8 p-7 transition duration-300 group-hover:bg-zinc-900/60 sm:p-9 lg:grid-cols-[minmax(0,0.62fr)_minmax(0,1.38fr)_auto] lg:items-center">
 				<div>
-					<div className="flex flex-wrap items-center gap-3 font-mono text-[0.65rem] uppercase tracking-[0.16em] text-zinc-600">
+					<div className="flex flex-wrap items-center gap-3 font-mono text-[0.65rem] uppercase tracking-[0.16em] text-zinc-400">
 						<span>{String(index).padStart(2, "0")}</span>
 						<span className="h-px w-5 bg-zinc-800" aria-hidden="true" />
 						<span>
@@ -48,7 +48,7 @@ export function HomeProjectProof({
 								data-project-fact={fact.label}
 								className="border-l border-zinc-800 pl-4"
 							>
-								<dt className="font-mono text-[0.6rem] uppercase tracking-[0.16em] text-zinc-600">
+								<dt className="font-mono text-[0.6rem] uppercase tracking-[0.16em] text-zinc-400">
 									{fact.label}
 								</dt>
 								<dd className="mt-2 text-sm leading-6 text-zinc-300">

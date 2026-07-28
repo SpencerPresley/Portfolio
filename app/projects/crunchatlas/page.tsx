@@ -200,7 +200,7 @@ export default function CrunchAtlasCaseStudy() {
 							coverage. The UI is optional, so capture does not depend on its
 							lifecycle.
 						</p>
-						<p className="mt-3 text-xs leading-6 text-zinc-600">
+						<p className="mt-3 text-xs leading-6 text-zinc-400">
 							This is a stability-oriented foundation with deliberate legacy
 							parity still deferred.
 						</p>

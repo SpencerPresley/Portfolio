@@ -266,11 +266,11 @@ export function ProjectCard({
 
 				<div className="flex flex-1 flex-col p-6 sm:p-8">
 					<div className="flex items-center justify-between gap-4">
-						<span className="font-mono text-[0.65rem] tracking-[0.18em] text-zinc-600">
+						<span className="font-mono text-[0.65rem] tracking-[0.18em] text-zinc-400">
 							{String(index + 1).padStart(2, "0")}
 						</span>
 						<div className="flex items-center gap-3">
-							<span className="font-mono text-[0.65rem] uppercase tracking-[0.14em] text-zinc-500">
+							<span className="font-mono text-[0.65rem] uppercase tracking-[0.14em] text-zinc-400">
 								{project.year}
 							</span>
 							<ProjectStatusPill status={project.status} />
@@ -299,7 +299,7 @@ export function ProjectCard({
 						{project.stack.slice(0, 4).map((technology) => (
 							<span
 								key={technology}
-								className="rounded-full border border-zinc-800 bg-zinc-950/50 px-3 py-1.5 font-mono text-[0.62rem] text-zinc-500"
+								className="rounded-full border border-zinc-800 bg-zinc-950/50 px-3 py-1.5 font-mono text-[0.62rem] text-zinc-400"
 							>
 								{technology}
 							</span>

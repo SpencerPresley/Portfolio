@@ -87,7 +87,7 @@ export default async function ProjectPage({ params }: Props) {
 				<header className="pb-14 pt-16 sm:pt-20">
 					<div className="flex flex-wrap items-center gap-3">
 						<ProjectStatusPill status={project.status} />
-						<span className="font-mono text-[0.68rem] uppercase tracking-[0.18em] text-zinc-500">
+						<span className="font-mono text-[0.68rem] uppercase tracking-[0.18em] text-zinc-400">
 							{project.category} · {project.year}
 						</span>
 					</div>
@@ -108,7 +108,7 @@ export default async function ProjectPage({ params }: Props) {
 						</div>
 
 						<div className="lg:border-l lg:border-zinc-800 lg:pl-8">
-							<p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-zinc-600">
+							<p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-zinc-400">
 								My role
 							</p>
 							<p className="mt-3 text-sm leading-7 text-zinc-300">
@@ -134,7 +134,7 @@ export default async function ProjectPage({ params }: Props) {
 									))}
 								</div>
 							) : (
-								<p className="mt-6 text-xs leading-6 text-zinc-600">
+								<p className="mt-6 text-xs leading-6 text-zinc-400">
 									Private repository · no public project link
 								</p>
 							)}
@@ -154,7 +154,7 @@ export default async function ProjectPage({ params }: Props) {
 									: ""
 							} ${index === 0 ? "sm:pl-0" : ""}`}
 						>
-							<dt className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-zinc-600">
+							<dt className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-zinc-400">
 								{fact.label}
 							</dt>
 							<dd className="mt-2 text-sm leading-6 text-zinc-200">
@@ -167,7 +167,7 @@ export default async function ProjectPage({ params }: Props) {
 				<div className="grid gap-16 py-20 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-20">
 					<aside>
 						<div className="lg:sticky lg:top-10">
-							<p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-zinc-600">
+							<p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-zinc-400">
 								Built with
 							</p>
 							<ul className="mt-5 flex flex-wrap gap-2 lg:flex-col lg:items-start">
@@ -249,7 +249,7 @@ export default async function ProjectPage({ params }: Props) {
 									{project.codeComparison.title}
 								</h2>
 							</div>
-							<p className="text-sm leading-7 text-zinc-500">
+							<p className="text-sm leading-7 text-zinc-400">
 								{project.codeComparison.description}
 							</p>
 						</div>
@@ -265,7 +265,7 @@ export default async function ProjectPage({ params }: Props) {
 									<div className="p-6 sm:p-7">
 										<p
 											className={`font-mono text-[0.65rem] uppercase tracking-[0.18em] ${
-												index === 0 ? "text-zinc-500" : accent.text
+												index === 0 ? "text-zinc-400" : accent.text
 											}`}
 										>
 											{sample.label}
@@ -273,7 +273,7 @@ export default async function ProjectPage({ params }: Props) {
 										<h3 className="mt-4 text-lg font-semibold text-zinc-100">
 											{sample.title}
 										</h3>
-										<p className="mt-3 text-sm leading-7 text-zinc-500">
+										<p className="mt-3 text-sm leading-7 text-zinc-400">
 											{sample.detail}
 										</p>
 									</div>
@@ -291,7 +291,7 @@ export default async function ProjectPage({ params }: Props) {
 						className="border-t border-zinc-800 py-16"
 						aria-labelledby={`${project.slug}-related-projects`}
 					>
-						<p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-zinc-600">
+						<p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-zinc-400">
 							Connected work
 						</p>
 						<h2
@@ -329,7 +329,7 @@ export default async function ProjectPage({ params }: Props) {
 												<h3 className="font-display text-2xl text-zinc-100 transition group-hover:text-white">
 													{relatedProject.title}
 												</h3>
-												<p className="mt-3 text-sm leading-7 text-zinc-500 transition group-hover:text-zinc-400">
+												<p className="mt-3 text-sm leading-7 text-zinc-400 transition group-hover:text-zinc-300">
 													{relationship.detail}
 												</p>
 											</div>
@@ -363,7 +363,7 @@ export default async function ProjectPage({ params }: Props) {
 								The decisions that shaped it.
 							</h2>
 						</div>
-						<p className="text-sm leading-7 text-zinc-500">
+						<p className="text-sm leading-7 text-zinc-400">
 							The implementation details matter because each one closes a
 							specific failure mode or keeps an important boundary visible.
 						</p>
@@ -375,13 +375,13 @@ export default async function ProjectPage({ params }: Props) {
 								key={decision.title}
 								className="rounded-2xl border border-zinc-800 bg-zinc-900/45 p-6"
 							>
-								<span className="font-mono text-[0.65rem] text-zinc-600">
+								<span className="font-mono text-[0.65rem] text-zinc-400">
 									{String(index + 1).padStart(2, "0")}
 								</span>
 								<h3 className="mt-5 text-base font-semibold text-zinc-100">
 									{decision.title}
 								</h3>
-								<p className="mt-3 text-sm leading-7 text-zinc-500">
+								<p className="mt-3 text-sm leading-7 text-zinc-400">
 									{decision.detail}
 								</p>
 							</article>
@@ -415,14 +415,14 @@ export default async function ProjectPage({ params }: Props) {
 					className="group grid gap-8 border-t border-zinc-800 py-12 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-sky-400 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end"
 				>
 					<div>
-						<p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-zinc-600">
+						<p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-zinc-400">
 							Next case study
 						</p>
 						<p className="mt-4 font-display text-3xl text-zinc-200 transition group-hover:text-white sm:text-4xl">
 							{nextProject.title}
 						</p>
 					</div>
-					<span className="inline-flex items-center gap-2 text-sm text-zinc-500 transition group-hover:text-zinc-200">
+					<span className="inline-flex items-center gap-2 text-sm text-zinc-400 transition group-hover:text-zinc-200">
 						Keep reading
 						<ArrowRight
 							className="h-4 w-4 transition group-hover:translate-x-1"

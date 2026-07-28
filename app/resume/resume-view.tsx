@@ -63,7 +63,7 @@ function SectionHeading({
 }) {
   return (
     <div className="mb-8 flex items-center gap-4">
-      <span className="font-mono text-xs text-zinc-600">{index}</span>
+      <span className="font-mono text-xs text-zinc-400">{index}</span>
       <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-zinc-300">
         {children}
       </h2>
@@ -128,7 +128,7 @@ export function ResumeView({
           </div>
 
           <div>
-            <p className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-zinc-500">
+            <p className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-zinc-400">
               Choose a focus
             </p>
             <nav
@@ -160,7 +160,7 @@ export function ResumeView({
                       </span>
                       <span
                         className={`mt-1 block text-xs ${
-                          isSelected ? "text-zinc-600" : "text-zinc-600"
+                          isSelected ? "text-zinc-600" : "text-zinc-400"
                         }`}
                       >
                         {focus === "ai-llm"
@@ -196,7 +196,7 @@ export function ResumeView({
                     className="grid gap-5 sm:grid-cols-[10rem_minmax(0,1fr)] sm:gap-8"
                   >
                     <div>
-                      <p className="font-mono text-xs leading-5 text-zinc-500">
+                      <p className="font-mono text-xs leading-5 text-zinc-400">
                         {experience.dates}
                       </p>
                     </div>
@@ -208,7 +208,7 @@ export function ResumeView({
                         <p className="text-sm text-sky-300">{experience.role}</p>
                       </div>
                       {experience.context ? (
-                        <p className="mt-3 border-l border-zinc-700 pl-4 text-sm italic leading-6 text-zinc-500">
+                        <p className="mt-3 border-l border-zinc-700 pl-4 text-sm italic leading-6 text-zinc-400">
                           {experience.context}
                         </p>
                       ) : null}
@@ -236,7 +236,7 @@ export function ResumeView({
                     <h3 className="font-display text-xl text-white">
                       {project.name}
                     </h3>
-                    <p className="mt-2 font-mono text-[0.68rem] uppercase leading-5 tracking-[0.12em] text-zinc-500">
+                    <p className="mt-2 font-mono text-[0.68rem] uppercase leading-5 tracking-[0.12em] text-zinc-400">
                       {project.technologies.join(" · ")}
                     </p>
                     <ul className="mt-5 space-y-4 text-sm">
@@ -270,7 +270,7 @@ export function ResumeView({
             <section aria-labelledby="contact-heading">
               <h2
                 id="contact-heading"
-                className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500"
+                className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400"
               >
                 Contact
               </h2>
@@ -321,7 +321,7 @@ export function ResumeView({
             <section aria-labelledby="skills-heading">
               <h2
                 id="skills-heading"
-                className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500"
+                className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400"
               >
                 Skills for this focus
               </h2>
@@ -352,7 +352,7 @@ export function ResumeView({
             >
               <h2
                 id="education-heading"
-                className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500"
+                className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400"
               >
                 Education
               </h2>
@@ -362,14 +362,14 @@ export function ResumeView({
               <p className="mt-2 text-sm leading-6 text-zinc-400">
                 {resumeEducation.degree}
               </p>
-              <p className="mt-2 font-mono text-xs text-zinc-600">
+              <p className="mt-2 font-mono text-xs text-zinc-400">
                 {resumeEducation.dates}
               </p>
             </section>
           </aside>
         </div>
 
-        <footer className="mt-24 flex flex-col gap-4 border-t border-zinc-800 pt-8 text-sm text-zinc-500 sm:flex-row sm:items-center sm:justify-between">
+        <footer className="mt-24 flex flex-col gap-4 border-t border-zinc-800 pt-8 text-sm text-zinc-400 sm:flex-row sm:items-center sm:justify-between">
           <p>Prefer the one-page version?</p>
           <a
             href={resume.pdf}

@@ -92,7 +92,7 @@ export default function ProjectsPage() {
 									<span className="block text-sm font-medium text-zinc-200">
 										{label}
 									</span>
-									<span className="mt-1 block text-xs leading-5 text-zinc-500">
+									<span className="mt-1 block text-xs leading-5 text-zinc-400">
 										{detail}
 									</span>
 								</span>
@@ -103,7 +103,7 @@ export default function ProjectsPage() {
 
 				<section className="pt-16" aria-labelledby="professional-work">
 					<div className="mb-8 flex items-center gap-4">
-						<span className="font-mono text-xs text-zinc-600">01</span>
+						<span className="font-mono text-xs text-zinc-400">01</span>
 						<h2
 							id="professional-work"
 							className="text-sm font-semibold uppercase tracking-[0.2em] text-zinc-300"
@@ -126,7 +126,7 @@ export default function ProjectsPage() {
 
 				<section className="pt-16" aria-labelledby="featured-work">
 					<div className="mb-8 flex items-center gap-4">
-						<span className="font-mono text-xs text-zinc-600">02</span>
+						<span className="font-mono text-xs text-zinc-400">02</span>
 						<h2
 							id="featured-work"
 							className="text-sm font-semibold uppercase tracking-[0.2em] text-zinc-300"
@@ -147,7 +147,7 @@ export default function ProjectsPage() {
 
 				<section className="pt-20" aria-labelledby="more-projects">
 					<div className="mb-8 flex items-center gap-4">
-						<span className="font-mono text-xs text-zinc-600">03</span>
+						<span className="font-mono text-xs text-zinc-400">03</span>
 						<h2
 							id="more-projects"
 							className="text-sm font-semibold uppercase tracking-[0.2em] text-zinc-300"
@@ -170,7 +170,7 @@ export default function ProjectsPage() {
 
 				<section className="pt-20" aria-labelledby="open-source-contributions">
 					<div className="mb-8 flex items-center gap-4">
-						<span className="font-mono text-xs text-zinc-600">04</span>
+						<span className="font-mono text-xs text-zinc-400">04</span>
 						<h2
 							id="open-source-contributions"
 							className="text-sm font-semibold uppercase tracking-[0.2em] text-zinc-300"
@@ -202,7 +202,7 @@ export default function ProjectsPage() {
 									<p className="mt-4 max-w-3xl text-sm leading-7 text-zinc-400 sm:text-[0.95rem]">
 										{contribution.summary}
 									</p>
-									<p className="mt-3 max-w-3xl text-xs leading-6 text-zinc-600">
+									<p className="mt-3 max-w-3xl text-xs leading-6 text-zinc-400">
 										{contribution.credit}
 									</p>
 								</div>

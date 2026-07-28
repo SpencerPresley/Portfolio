@@ -70,7 +70,7 @@ export default function Home() {
 
 				<section className="pt-16" aria-labelledby="selected-work">
 					<div className="mb-8 flex items-center gap-4">
-						<span className="font-mono text-xs text-zinc-600">01</span>
+						<span className="font-mono text-xs text-zinc-400">01</span>
 						<h2
 							id="selected-work"
 							className="text-sm font-semibold uppercase tracking-[0.2em] text-zinc-300"
