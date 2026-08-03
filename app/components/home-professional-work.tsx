@@ -8,36 +8,36 @@ export function HomeProfessionalWork({
 }: {
 	work: ProfessionalWork;
 }) {
-	if (!work.image) {
-		throw new Error(`Homepage professional work requires an image: ${work.slug}`);
-	}
-
 	return (
 		<article
 			data-home-professional-work={work.slug}
-			className="grid overflow-hidden rounded-3xl border border-amber-400/20 bg-zinc-900/55 lg:grid-cols-[1.1fr_0.9fr]"
+			className={`overflow-hidden rounded-3xl border border-amber-400/20 bg-zinc-900/55 ${
+				work.image ? "grid lg:grid-cols-[1.1fr_0.9fr]" : ""
+			}`}
 		>
-			<Link
-				href={work.href}
-				className="group relative min-h-[18rem] overflow-hidden border-b border-zinc-800 bg-zinc-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-400 lg:min-h-full lg:border-b-0 lg:border-r"
-			>
-				<Image
-					src={work.image.src}
-					alt={work.image.alt}
-					fill
-					priority
-					sizes="(max-width: 1024px) 100vw, 55vw"
-					className="object-cover transition duration-300 group-hover:scale-[1.01]"
-				/>
-				<div
-					className="pointer-events-none absolute inset-0 bg-gradient-to-t from-zinc-950/75 via-transparent to-transparent"
-					aria-hidden="true"
-				/>
-				<span className="absolute left-5 top-5 rounded-full border border-white/10 bg-zinc-950/80 px-3 py-1.5 font-mono text-[0.62rem] uppercase tracking-[0.16em] text-zinc-300 backdrop-blur">
-					Public marketing image
-				</span>
-				<span className="sr-only">Read {work.cardTitle} case study</span>
-			</Link>
+			{work.image ? (
+				<Link
+					href={work.href}
+					className="group relative min-h-[18rem] overflow-hidden border-b border-zinc-800 bg-zinc-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-400 lg:min-h-full lg:border-b-0 lg:border-r"
+				>
+					<Image
+						src={work.image.src}
+						alt={work.image.alt}
+						fill
+						priority
+						sizes="(max-width: 1024px) 100vw, 55vw"
+						className="object-cover transition duration-300 group-hover:scale-[1.01]"
+					/>
+					<div
+						className="pointer-events-none absolute inset-0 bg-gradient-to-t from-zinc-950/75 via-transparent to-transparent"
+						aria-hidden="true"
+					/>
+					<span className="absolute left-5 top-5 rounded-full border border-white/10 bg-zinc-950/80 px-3 py-1.5 font-mono text-[0.62rem] uppercase tracking-[0.16em] text-zinc-300 backdrop-blur">
+						Public marketing image
+					</span>
+					<span className="sr-only">Read {work.cardTitle} case study</span>
+				</Link>
+			) : null}
 
 			<div className="flex flex-col p-7 sm:p-9">
 				<p className="font-mono text-[0.68rem] uppercase tracking-[0.2em] text-amber-300">

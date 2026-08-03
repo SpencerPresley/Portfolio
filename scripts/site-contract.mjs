@@ -346,7 +346,7 @@ async function crunchAtlasSuite() {
 	const html = await renderedPage("/projects/crunchatlas");
 	const content = mainContent(html);
 	const text = visibleText(content);
-	const shouldRenderProductProof =
+	const shouldRenderCrunchAtlasImages =
 		process.env.SHOW_CRUNCHATLAS_IMAGES === "true";
 
 	assert.ok(
@@ -368,14 +368,14 @@ async function crunchAtlasSuite() {
 		"crunchatlas-agent-report.webp",
 	]) {
 		assert.equal(
-			content.includes(image),
-			shouldRenderProductProof,
+			html.includes(image),
+			shouldRenderCrunchAtlasImages,
 			`CrunchAtlas ${image} visibility must match SHOW_CRUNCHATLAS_IMAGES`,
 		);
 	}
 	assert.equal(
 		content.includes('id="product-proof"'),
-		shouldRenderProductProof,
+		shouldRenderCrunchAtlasImages,
 		"CrunchAtlas Product proof visibility must match SHOW_CRUNCHATLAS_IMAGES",
 	);
 	assert.ok(
@@ -450,6 +450,8 @@ async function previewsSuite() {
 	const home = mainContent(await renderedPage("/"));
 	const projects = mainContent(await renderedPage("/projects"));
 	const homeText = visibleText(home);
+	const shouldRenderCrunchAtlasImages =
+		process.env.SHOW_CRUNCHATLAS_IMAGES === "true";
 	const anchorHrefs = (content) =>
 		[...content.matchAll(/<a\b([^>]*)>/gi)].map((match) =>
 			attribute(match[1], "href"),
@@ -516,6 +518,16 @@ async function previewsSuite() {
 			!projects.includes("crunchatlas-campaign-teaser.webp"),
 		"Professional previews must not reference the stale teaser asset",
 	);
+	for (const [surface, content] of [
+		["Home", home],
+		["Projects", projects],
+	]) {
+		assert.equal(
+			content.includes("crunchatlas-campaign-assessment.webp"),
+			shouldRenderCrunchAtlasImages,
+			`${surface} CrunchAtlas image visibility must match SHOW_CRUNCHATLAS_IMAGES`,
+		);
+	}
 	assert.ok(
 		homeText.includes(
 			"LinkedIn gives me enough context for a useful first conversation.",

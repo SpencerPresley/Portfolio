@@ -29,6 +29,9 @@ export type ProfessionalWork = {
 	image: ProfessionalWorkImage | undefined;
 };
 
+export const showCrunchAtlasImages =
+	process.env.SHOW_CRUNCHATLAS_IMAGES === "true";
+
 export const professionalWork = {
 	crunchatlas: {
 		slug: "crunchatlas",
@@ -60,10 +63,12 @@ export const professionalWork = {
 			"Governed local agents",
 			"Inspectable analysis",
 		],
-		image: {
-			src: "/projects/crunchatlas-campaign-assessment.webp",
-			alt: "Public CrunchAtlas marketing view showing a network security campaign summary",
-		},
+		image: showCrunchAtlasImages
+			? {
+					src: "/projects/crunchatlas-campaign-assessment.webp",
+					alt: "Public CrunchAtlas marketing view showing a network security campaign summary",
+				}
+			: undefined,
 	},
 	atlasconnect: {
 		slug: "atlasconnect",

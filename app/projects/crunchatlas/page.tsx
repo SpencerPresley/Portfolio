@@ -8,10 +8,12 @@ import {
 	ProfessionalCaseStudyFooter,
 	SystemFlow,
 } from "../professional-case-study-ui";
-import { professionalWork } from "../professional-work-data";
+import {
+	professionalWork,
+	showCrunchAtlasImages,
+} from "../professional-work-data";
 
 const work = professionalWork.crunchatlas;
-const showProductProof = process.env.SHOW_CRUNCHATLAS_IMAGES === "true";
 
 export const metadata: Metadata = {
 	title: work.title,
@@ -23,7 +25,9 @@ export const metadata: Metadata = {
 		title: work.title,
 		description: work.summary,
 		type: "article",
-		images: [{ url: "/projects/crunchatlas-campaign-assessment.webp" }],
+		images: showCrunchAtlasImages
+			? [{ url: "/projects/crunchatlas-campaign-assessment.webp" }]
+			: undefined,
 	},
 };
 
@@ -119,7 +123,7 @@ export default function CrunchAtlasCaseStudy() {
 				</div>
 			</CaseStudySection>
 
-			{showProductProof ? (
+			{showCrunchAtlasImages ? (
 				<CaseStudySection
 					number="03"
 					eyebrow="Product proof"
