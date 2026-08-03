@@ -346,6 +346,8 @@ async function crunchAtlasSuite() {
 	const html = await renderedPage("/projects/crunchatlas");
 	const content = mainContent(html);
 	const text = visibleText(content);
+	const shouldRenderProductProof =
+		process.env.SHOW_CRUNCHATLAS_IMAGES === "true";
 
 	assert.ok(
 		html.includes('data-professional-case-study="crunchatlas"'),
@@ -365,8 +367,17 @@ async function crunchAtlasSuite() {
 		"crunchatlas-campaign-assessment.webp",
 		"crunchatlas-agent-report.webp",
 	]) {
-		assert.ok(content.includes(image), `CrunchAtlas must render ${image}`);
+		assert.equal(
+			content.includes(image),
+			shouldRenderProductProof,
+			`CrunchAtlas ${image} visibility must match SHOW_CRUNCHATLAS_IMAGES`,
+		);
 	}
+	assert.equal(
+		content.includes('id="product-proof"'),
+		shouldRenderProductProof,
+		"CrunchAtlas Product proof visibility must match SHOW_CRUNCHATLAS_IMAGES",
+	);
 	assert.ok(
 		content.includes('href="https://www.crunchatlas.com/"'),
 		"CrunchAtlas must link to the public product site",

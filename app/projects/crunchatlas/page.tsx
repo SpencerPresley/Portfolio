@@ -11,6 +11,7 @@ import {
 import { professionalWork } from "../professional-work-data";
 
 const work = professionalWork.crunchatlas;
+const showProductProof = process.env.SHOW_CRUNCHATLAS_IMAGES === "true";
 
 export const metadata: Metadata = {
 	title: work.title,
@@ -118,27 +119,29 @@ export default function CrunchAtlasCaseStudy() {
 				</div>
 			</CaseStudySection>
 
-			<CaseStudySection
-				number="03"
-				eyebrow="Product proof"
-				title="The infrastructure ends in inspectable work."
-				id="product-proof"
-				intro="Public marketing views show the boundary I can expose: evidence-backed assessment and an agent-generated report, not customer data or internal detection logic."
-			>
-				<div className="space-y-6">
-					<MarketingShot
-						src="/projects/crunchatlas-campaign-assessment.webp"
-						alt="CrunchAtlas campaign assessment showing summarized network-security evidence and findings"
-						caption="Public CrunchAtlas marketing image: a campaign assessment turns collected evidence into an inspectable security result."
-						priority
-					/>
-					<MarketingShot
-						src="/projects/crunchatlas-agent-report.webp"
-						alt="CrunchAtlas case view showing a structured report produced by a security analysis agent"
-						caption="Public CrunchAtlas marketing image: a domain agent's result is presented as a structured report rather than an opaque chat response."
-					/>
-				</div>
-			</CaseStudySection>
+			{showProductProof ? (
+				<CaseStudySection
+					number="03"
+					eyebrow="Product proof"
+					title="The infrastructure ends in inspectable work."
+					id="product-proof"
+					intro="Public marketing views show the boundary I can expose: evidence-backed assessment and an agent-generated report, not customer data or internal detection logic."
+				>
+					<div className="space-y-6">
+						<MarketingShot
+							src="/projects/crunchatlas-campaign-assessment.webp"
+							alt="CrunchAtlas campaign assessment showing summarized network-security evidence and findings"
+							caption="Public CrunchAtlas marketing image: a campaign assessment turns collected evidence into an inspectable security result."
+							priority
+						/>
+						<MarketingShot
+							src="/projects/crunchatlas-agent-report.webp"
+							alt="CrunchAtlas case view showing a structured report produced by a security analysis agent"
+							caption="Public CrunchAtlas marketing image: a domain agent's result is presented as a structured report rather than an opaque chat response."
+						/>
+					</div>
+				</CaseStudySection>
+			) : null}
 
 			<CaseStudySection
 				number="04"
