@@ -5,6 +5,7 @@ import {
 	PageAtmosphere,
 	pageAtmosphereStyles,
 } from "../components/page-atmosphere";
+import { TrackedLink } from "../components/tracked-link";
 import { siteContact } from "../site-data";
 
 export const metadata: Metadata = {
@@ -50,7 +51,9 @@ export default function ContactPage() {
 						Contact methods
 					</h2>
 
-					<a
+					<TrackedLink
+						event="contact_click"
+						eventProperties={{ channel: "linkedin", placement: "primary" }}
 						href={siteContact.linkedin.href}
 						target="_blank"
 						rel="noreferrer"
@@ -77,10 +80,12 @@ export default function ContactPage() {
 							className="h-5 w-5 text-zinc-600 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-sky-300"
 							aria-hidden="true"
 						/>
-					</a>
+					</TrackedLink>
 
 					<div className="mt-5 grid gap-5 sm:grid-cols-2">
-						<a
+						<TrackedLink
+							event="contact_click"
+							eventProperties={{ channel: "email", placement: "fallback" }}
 							href={`mailto:${siteContact.email}`}
 							data-contact-method="email"
 							className="group relative grid gap-5 rounded-3xl border border-zinc-800 bg-zinc-900/35 p-6 transition hover:-translate-y-1 hover:border-sky-400/40 hover:bg-zinc-900/60 focus:outline-none focus:ring-2 focus:ring-sky-400 sm:p-8 lg:grid-cols-[3rem_minmax(0,1fr)_auto] lg:items-center"
@@ -103,9 +108,11 @@ export default function ContactPage() {
 								className="absolute right-6 top-6 h-4 w-4 shrink-0 text-zinc-500 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-sky-300 sm:right-8 sm:top-8 lg:static lg:ml-auto"
 								aria-hidden="true"
 							/>
-						</a>
+						</TrackedLink>
 
-						<a
+						<TrackedLink
+							event="contact_click"
+							eventProperties={{ channel: "github", placement: "fallback" }}
 							href={siteContact.github.href}
 							target="_blank"
 							rel="noreferrer"
@@ -127,7 +134,7 @@ export default function ContactPage() {
 								className="absolute right-6 top-6 h-4 w-4 shrink-0 text-zinc-500 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-violet-300 sm:right-8 sm:top-8 lg:static lg:ml-auto"
 								aria-hidden="true"
 							/>
-						</a>
+						</TrackedLink>
 					</div>
 				</section>
 			</main>

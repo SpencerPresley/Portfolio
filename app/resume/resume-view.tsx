@@ -11,6 +11,7 @@ import {
   PageAtmosphere,
   pageAtmosphereStyles,
 } from "../components/page-atmosphere";
+import { TrackedLink } from "../components/tracked-link";
 import { siteContact } from "../site-data";
 import {
   type ResumeBullet,
@@ -107,15 +108,19 @@ export function ResumeView({
               {resume.introduction}
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <a
+              <TrackedLink
+                event="resume_download"
+                eventProperties={{ variant: resume.id, placement: "header" }}
                 href={resume.pdf}
                 download
                 className="inline-flex items-center gap-2 rounded-full bg-zinc-100 px-5 py-3 text-sm font-medium text-zinc-950 transition hover:bg-white focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2 focus:ring-offset-zinc-950"
               >
                 <ArrowDownToLine className="h-4 w-4" aria-hidden="true" />
                 Download {resume.shortLabel} PDF
-              </a>
-              <a
+              </TrackedLink>
+              <TrackedLink
+                event="resume_open"
+                eventProperties={{ variant: resume.id, placement: "header" }}
                 href={resume.pdf}
                 target="_blank"
                 rel="noreferrer"
@@ -123,7 +128,7 @@ export function ResumeView({
               >
                 Open PDF
                 <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-              </a>
+              </TrackedLink>
             </div>
           </div>
 
@@ -371,14 +376,16 @@ export function ResumeView({
 
         <footer className="mt-24 flex flex-col gap-4 border-t border-zinc-800 pt-8 text-sm text-zinc-400 sm:flex-row sm:items-center sm:justify-between">
           <p>Prefer the one-page version?</p>
-          <a
+          <TrackedLink
+            event="resume_download"
+            eventProperties={{ variant: resume.id, placement: "footer" }}
             href={resume.pdf}
             download
             className="inline-flex items-center gap-2 text-zinc-300 transition hover:text-white"
           >
             Download {resume.label}
             <ArrowDownToLine className="h-4 w-4" aria-hidden="true" />
-          </a>
+          </TrackedLink>
         </footer>
       </main>
     </div>
