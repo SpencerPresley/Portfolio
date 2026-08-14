@@ -4,6 +4,7 @@ import LocalFont from "next/font/local";
 import type { Metadata } from "next";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
 import { Analytics as BeamAnalytics } from "./components/beam_analytics";
+import { VisitBeacon } from "./components/visit-beacon";
 
 const siteDescription =
 	"Spencer Presley is a software engineer building reliable AI, backend, and platform systems.";
@@ -92,6 +93,7 @@ export default function RootLayout({
 			>
 				{children}
 				<VercelAnalytics />
+				<VisitBeacon />
 			</body>
 		</html>
 	);
