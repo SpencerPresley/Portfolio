@@ -12,7 +12,7 @@ import { professionalWork } from "./projects/professional-work-data";
 
 const homeAtmosphere = pageAtmosphereStyles.home;
 
-const homepageProjects = ["gloss", "celery-fork-safety"].map((slug) => {
+const homepageProjects = ["docq", "celery-fork-safety"].map((slug) => {
 	const project = getProject(slug);
 
 	if (!project) {

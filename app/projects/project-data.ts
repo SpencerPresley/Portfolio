@@ -107,8 +107,8 @@ export const projectStatusLabels: Record<ProjectStatus, string> = {
 
 export const projects: readonly Project[] = [
 	{
-		slug: "gloss",
-		title: "gloss",
+		slug: "docq",
+		title: "docq (formerly gloss)",
 		eyebrow: "Local retrieval engine",
 		summary:
 			"A hybrid search engine that returns a source document's actual passages—with citations—instead of generating a paraphrase.",
@@ -123,7 +123,7 @@ export const projects: readonly Project[] = [
 		links: [
 			{
 				label: "GitHub",
-				href: "https://github.com/SpencerPresley/gloss",
+				href: "https://github.com/SpencerPresley/docq",
 			},
 		],
 		facts: [

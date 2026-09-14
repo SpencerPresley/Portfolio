@@ -176,9 +176,24 @@ async function brandingSuite() {
 }
 
 async function navigationSuite() {
+	const legacyProjectResponse = await fetch(
+		new URL("/projects/gloss", baseUrl),
+		{ redirect: "manual" },
+	);
+	assert.equal(
+		legacyProjectResponse.status,
+		308,
+		"/projects/gloss must permanently redirect",
+	);
+	assert.equal(
+		new URL(legacyProjectResponse.headers.get("location"), baseUrl).pathname,
+		"/projects/docq",
+		"/projects/gloss must redirect to the canonical docq route",
+	);
+
 	const cases = [
 		{ pathname: "/", current: "Spencer Presley", indicator: false },
-		{ pathname: "/projects/gloss", current: "Projects", indicator: true },
+		{ pathname: "/projects/docq", current: "Projects", indicator: true },
 		{ pathname: "/contact", current: "Contact", indicator: true },
 		{
 			pathname: "/resume/backend-platform",
@@ -473,8 +488,8 @@ async function previewsSuite() {
 				/data-(?:home-professional-work|home-project)="([^"]+)"/gi,
 			),
 		].map((match) => match[1]),
-		["crunchatlas", "gloss", "celery-fork-safety"],
-		"Home must preserve its CrunchAtlas, gloss, and Celery proof order",
+		["crunchatlas", "docq", "celery-fork-safety"],
+		"Home must preserve its CrunchAtlas, docq, and Celery proof order",
 	);
 	assert.deepEqual(
 		[...projects.matchAll(/data-professional-work-card="([^"]+)"/gi)].map(
