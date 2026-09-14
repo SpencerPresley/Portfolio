@@ -112,7 +112,7 @@ export const projects: readonly Project[] = [
 		eyebrow: "Local retrieval engine",
 		summary:
 			"A hybrid search engine that returns a source document's actual passages—with citations—instead of generating a paraphrase.",
-		lead: "gloss turns a source text into a portable SQLite corpus, then searches it through independent lexical and local-vector channels. The design keeps the source verbatim, makes every hit inspectable, and treats retrieval quality as something to measure rather than vibe-check.",
+		lead: "docq turns a source text into a portable SQLite corpus, then searches it through independent lexical and local-vector channels. The design keeps the source verbatim, makes every hit inspectable, and treats retrieval quality as something to measure rather than vibe-check.",
 		year: "2026",
 		status: "active",
 		category: "Retrieval systems",
@@ -142,7 +142,7 @@ export const projects: readonly Project[] = [
 			{
 				title: "The constraint",
 				paragraphs: [
-					"Most AI search products optimize for a fluent answer. That is the wrong output when the job is to recover what a source actually said. gloss is built around a stricter contract: return the original passage, preserve its location, and expose why it ranked.",
+					"Most AI search products optimize for a fluent answer. That is the wrong output when the job is to recover what a source actually said. docq is built around a stricter contract: return the original passage, preserve its location, and expose why it ranked.",
 					"The first corpus is A Philosophy of Software Design, but the engine is deliberately corpus-agnostic. Book-specific taxonomy, evaluation cases, and enrichment prompts live outside the retrieval core.",
 				],
 			},
