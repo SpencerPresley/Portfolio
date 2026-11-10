@@ -28,10 +28,11 @@ The web-native resume content is intentionally hard-coded in
 - AI & LLM Systems at `/resume`
 - Backend & Platform at `/resume/backend-platform`
 
-The downloadable PDFs are rendered in the separate resume repository. The
-resume sources there carry a phone number that must NOT be published, so the
-public PDFs are rendered from phone-stripped copies. On Spencer's current
-machine, refresh them with:
+The downloadable PDFs are rendered in the separate resume repositories:
+`~/resume` is the public renderer (`SpencerPresley/resume-system`) and
+`~/resume/me` is the private content (`SpencerPresley/resume-private`). The
+resume sources carry a phone number that must NOT be published, so the public
+PDFs are rendered from phone-stripped copies. Refresh them with:
 
 ```sh
 cd ~/resume
@@ -40,9 +41,8 @@ for v in presley_ai-llm-v2 presley_backend-platform; do
   # strip the phone; the freed space takes the LinkedIn URL the sent copies omit
   sed -e 's/^[0-9]\{3\}-[0-9]\{3\}-[0-9]\{4\} | //' \
       -e '3s#$# | [linkedin.com/in/spencerpresley96](https://linkedin.com/in/spencerpresley96)#' \
-      versions/variants/$v.md > "$out/$v.md"
-  pandoc "$out/$v.md" -s --include-in-header=.render/style.html --metadata title="Spencer Presley" -o "$out/$v.html"
-  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless --no-pdf-header-footer --print-to-pdf="$out/$v.pdf" "file://$out/$v.html"
+      me/versions/variants/$v.md > "$out/$v.md"
+  ./render.sh "$out/$v.md"
 done
 cd ~/code/Portfolio
 cp "$out/presley_ai-llm-v2.pdf" public/spencer-presley-ai-llm-resume.pdf
