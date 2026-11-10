@@ -37,7 +37,10 @@ machine, refresh them with:
 cd ~/resume
 out=$(mktemp -d)
 for v in presley_ai-llm-v2 presley_backend-platform; do
-  sed 's/^[0-9]\{3\}-[0-9]\{3\}-[0-9]\{4\} | //' versions/variants/$v.md > "$out/$v.md"
+  # strip the phone; the freed space takes the LinkedIn URL the sent copies omit
+  sed -e 's/^[0-9]\{3\}-[0-9]\{3\}-[0-9]\{4\} | //' \
+      -e '3s#$# | [linkedin.com/in/spencerpresley96](https://linkedin.com/in/spencerpresley96)#' \
+      versions/variants/$v.md > "$out/$v.md"
   pandoc "$out/$v.md" -s --include-in-header=.render/style.html --metadata title="Spencer Presley" -o "$out/$v.html"
   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless --no-pdf-header-footer --print-to-pdf="$out/$v.pdf" "file://$out/$v.html"
 done

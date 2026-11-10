@@ -306,29 +306,24 @@ export const resumeVariants: Record<ResumeFocus, ResumeVariant> = {
           "Local-first, air-gapped AI security platform for critical infrastructure. Sole author of the systems below.",
         bullets: [
           {
-            lead: "Created the company's agent platform from scratch",
+            lead: "Created the company's agent platform from scratch.",
             detail:
-              ". A shared agent harness supplies model construction, retries, structured-output repair, context management, tool guardrails, per-task budgets, and typed lifecycle events; each agent adds only its domain prompt, tools, state, and graph.",
+              " A shared harness supplies model construction, retries, structured-output repair, context management, tool guardrails, per-task budgets, and typed lifecycle events; each agent adds only its domain prompt, tools, state, and graph.",
           },
           {
-            lead: "Kept long-running agents on task beyond a single context window",
+            lead: "Kept long agent runs inside a bounded context.",
             detail:
-              ". As context fills or the model repeats a tool call, the harness condenses the run to its objective, completed work, and next steps; oversized tool results move to searchable files the agent reads on demand instead of resending them with every model call.",
-          },
-          {
-            lead: "Prevented context overruns and truncated model turns from corrupting an agent run",
-            detail:
-              ". Before every llama.cpp call, the harness renders and tokenizes the exact outgoing request and refuses any prompt, summary, or retry that won't fit. If generation hits its cap, it drops the partial turn before memory or tool execution and regenerates once.",
+              " Before every llama.cpp call the harness tokenizes the exact request and refuses anything that won't fit; it condenses a filling run to its objective, completed work, and next steps, moves oversized tool results to searchable files, and drops a truncated turn before memory or tools see it.",
           },
           {
             lead: "Gave understaffed critical-infrastructure teams on-demand packet forensics",
             detail:
-              " through the platform's most-used agent. It drives tshark, Zeek, and foremost from an IDS alert through protocol reconstruction, IOC extraction, file carving, and timeline analysis, then delivers a cited report and triage verdict for defenders to review.",
+              " through the platform's most-used agent. It drives tshark, Zeek, and foremost from an IDS alert through protocol reconstruction, IOC extraction, file carving, and timeline analysis, then delivers a cited report and triage verdict.",
           },
           {
             lead: "Made the platform investigate on its own",
             detail:
-              ": a background reconciler decides which AI work should exist and queues it with no analyst click, completing nearly 17,000 PCAP investigations in its first two months. Each dispatch commits independently behind a durable resume cursor, and a user's click promotes an already-queued run ahead of all background work.",
+              ", completing nearly 17,000 PCAP investigations in its first two months with no analyst click. A background reconciler decides which AI work should exist and queues it; each dispatch commits independently behind a durable resume cursor.",
           },
           {
             lead: "Shipped PurpleHaze",
@@ -336,14 +331,14 @@ export const resumeVariants: Record<ResumeFocus, ResumeVariant> = {
               ", an autonomous penetration-testing product covering reconnaissance, exploitation, web, and credential testing. Its Metasploit tool keeps modules, options, and Meterpreter sessions alive across model turns and context compaction, so a full engagement ends in OWASP and NIST reports.",
           },
           {
-            lead: "Replaced fixed LLM concurrency with token-priced GPU admission",
+            lead: "Replaced fixed LLM concurrency with token-priced GPU admission.",
             detail:
-              ". Five fixed 131k-token llama.cpp slots became one 655k-token KV pool that holds any job mix whose declared context fits, from 7 concurrent 128k-context agents to 160 4k-token jobs, sized byte-exact against llama.cpp's KV-cache allocation.",
+              " Five fixed 131k-token llama.cpp slots became one 655k-token KV pool that holds any job mix whose declared context fits, from 7 concurrent 128k-context agents to 160 4k-token jobs, sized byte-exact against llama.cpp's KV cache.",
           },
           {
             lead: "Kept long-running GPU and sandbox jobs independently cancellable",
             detail:
-              " and returned in-flight work to a terminal state after crashes or hangs. The Postgres scheduler combines atomic `SELECT FOR UPDATE SKIP LOCKED` claims, interactive-first, per-customer fair-share ordering, per-run process isolation, heartbeats, and process-tree cancellation.",
+              " and returned in-flight work to a terminal state after crashes or hangs. The Postgres scheduler combines atomic `SELECT FOR UPDATE SKIP LOCKED` claims, interactive-first fair-share ordering, per-run process isolation, heartbeats, and process-tree cancellation.",
           },
         ],
       },
@@ -354,7 +349,7 @@ export const resumeVariants: Record<ResumeFocus, ResumeVariant> = {
         context: "",
         bullets: [
           {
-            lead: "Made an NSF-funded Chesapeake Bay salinity corpus directly searchable",
+            lead: "Made an NSF-funded Chesapeake Bay salinity corpus searchable",
             detail:
               " through a retrieval-augmented chatbot, built on FAISS/OpenAI retrieval and a streaming FastAPI/LangChain service; presented at MIT URTC.",
           },
@@ -369,12 +364,12 @@ export const resumeVariants: Record<ResumeFocus, ResumeVariant> = {
           {
             lead: "Created a cited retrieval engine",
             detail:
-              " that lets coding agents search a long reference instead of loading it into context. On a leakage-screened 266-case eval, hybrid BM25/vector retrieval reached 0.67 hit@1 and beat either channel alone; a skill-primed query-rewrite A/B raised it to 0.74 (p=0.0045).",
+              " that lets coding agents search a long reference instead of loading all of it. On a leakage-screened 266-case eval, hybrid BM25/vector retrieval reached 0.67 hit@1 and beat either channel alone; a skill-primed query-rewrite A/B raised it to 0.74 (p=0.0045).",
           },
         ],
       },
       {
-        name: "BitNet b1.58 (from scratch)",
+        name: "BitNet b1.58 Reimplementation",
         technologies: ["PyTorch", "ternary-weight LM", "byte-level", "Android"],
         bullets: [
           {
@@ -416,27 +411,27 @@ export const resumeVariants: Record<ResumeFocus, ResumeVariant> = {
           {
             lead: "Replaced Celery with a Postgres-native job queue",
             detail:
-              " for the platform's GPU, LLM, sandbox, and document jobs, so any one job can be cancelled without killing its worker. Workers claim atomically with `SELECT FOR UPDATE SKIP LOCKED`, interactive work always runs ahead of background work, customers take fair-share turns, and dependency DAGs gate what is claimable.",
+              " for the platform's GPU, LLM, sandbox, and document jobs, so any one job can be cancelled without killing its worker. Interactive work runs ahead of background work, customers take fair-share turns, dependency DAGs gate what is claimable, and workers claim with `SELECT FOR UPDATE SKIP LOCKED`.",
           },
           {
-            lead: "Made every job reach a terminal state even when its process dies",
+            lead: "Made every job reach a terminal state, even when its process dies.",
             detail:
-              ". Each runs under a spawned (not forked) supervisor that survives a segfault or OOM kill and reaps the child's process group, and a heartbeat sweeper fails jobs whose supervisor dies or freezes. Chaos tests SIGKILL live supervisors and kill the database mid-job.",
+              " Each runs under a spawned (not forked) supervisor that survives a segfault or OOM kill and reaps the child's process group, and a heartbeat sweeper fails jobs whose supervisor dies or freezes. Chaos tests SIGKILL live supervisors and kill the database mid-job.",
           },
           {
-            lead: "Replaced fixed LLM concurrency with token-priced GPU admission",
+            lead: "Replaced fixed LLM concurrency with token-priced GPU admission.",
             detail:
-              ". Five fixed 131k-token llama.cpp slots became one 655k-token KV pool that holds 7 concurrent 128k-context agents or 160 4k-token jobs; a per-pool Postgres advisory lock admits a job only when its declared tokens fit, and a claimer that waited on the lock re-prices under `READ COMMITTED`.",
+              " Five fixed 131k-token llama.cpp slots became one 655k-token KV pool that holds 7 concurrent 128k-context agents or 160 4k-token jobs; a per-pool Postgres advisory lock admits a job only when its tokens fit, re-pricing under `READ COMMITTED` after any wait.",
           },
           {
             lead: "Made the platform investigate on its own",
             detail:
-              ": a background reconciler queues the AI work that should exist with no analyst click, completing nearly 17,000 PCAP investigations in its first two months. Each dispatch commits independently behind a durable resume cursor, and a user's click promotes a queued run ahead of all background work.",
+              ", completing nearly 17,000 PCAP investigations in its first two months with no analyst click. A background reconciler queues the AI work that should exist; each dispatch commits independently behind a durable resume cursor.",
           },
           {
             lead: "Cut the Files page query from 12.3 s to 1.5 ms",
             detail:
-              " on a 7.2M-row table by moving per-document alert counts into a summary table kept exact by statement-level Postgres triggers, with a reconcile job that repairs any drift.",
+              " on a 7.2M-row table by moving per-document alert counts into a summary table kept exact by statement-level Postgres triggers, with a reconcile job that repairs drift.",
           },
           {
             lead: "Created the agent harness every security agent runs on",
@@ -451,7 +446,7 @@ export const resumeVariants: Record<ResumeFocus, ResumeVariant> = {
           {
             lead: "Rewrote the network-capture sensor from scratch in Rust",
             detail:
-              " (`#![forbid(unsafe_code)]` workspace-wide): a headless Linux daemon whose SQLite-WAL upload queue persists each capture before upload, so queued captures survive a restart instead of being lost with the old in-memory queue.",
+              " (`#![forbid(unsafe_code)]`): a headless Linux daemon whose SQLite-WAL upload queue persists each capture before upload, so queued captures survive a restart.",
           },
         ],
       },
@@ -478,7 +473,7 @@ export const resumeVariants: Record<ResumeFocus, ResumeVariant> = {
           {
             lead: "Created a cited retrieval engine",
             detail:
-              " that lets coding agents search a long reference instead of loading it into context. On a 266-case eval, hybrid BM25/vector retrieval beat either channel alone at 0.67 hit@1; a query-rewrite A/B raised it to 0.74 (p=0.0045).",
+              " that lets coding agents search a long reference without loading it. On a 266-case eval, hybrid BM25/vector retrieval beat either channel alone at 0.67 hit@1; a query-rewrite A/B raised it to 0.74 (p=0.0045).",
           },
         ],
       },
@@ -487,9 +482,9 @@ export const resumeVariants: Record<ResumeFocus, ResumeVariant> = {
         technologies: ["Python", "Celery", "GDB", "LLDB", "Docker"],
         bullets: [
           {
-            lead: "Traced a hanging Celery task to a fork-safety bug",
+            lead: "Traced a Celery hang to fork safety",
             detail:
-              ": a Rust-backed vector store initialized before `fork()` left the child holding a lock whose owner didn't survive the fork. Linux deadlocked on a futex (GDB); macOS crashed in libdispatch (LLDB).",
+              ": a Rust-backed vector store initialized before `fork()` left the child holding a lock whose owning thread didn't survive the fork. Linux deadlocked on a futex (GDB); macOS crashed in libdispatch (LLDB).",
           },
         ],
       },
