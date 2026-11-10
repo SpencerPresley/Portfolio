@@ -55,51 +55,54 @@ export const resumeVariants: Record<ResumeFocus, ResumeVariant> = {
     label: "AI & LLM Systems",
     shortLabel: "AI / LLM",
     headline: "AI systems, grounded in the machinery underneath.",
-    introduction:
-      "Agent runtimes, local model serving, GPU admission, and evidence-grounded products—built as production systems rather than model demos.",
+    introduction: "Agent runtimes, local model serving, GPU admission, and evidence-grounded products—built as production systems rather than model demos.",
     pdf: "/spencer-presley-ai-llm-resume.pdf",
     experience: [
       {
         organization: "CrunchAtlas",
         role: "Software Engineer",
         dates: "Mar 2025 – Present",
-        context:
-          "Local-first, air-gapped AI security platform for critical infrastructure. Sole author of the systems below.",
+        context: "Local-first, air-gapped AI security platform for critical infrastructure. Sole author of the systems below.",
         bullets: [
           {
-            lead: "Built the PCAP analysis agent",
+            lead: "Created the company's agent platform from scratch",
             detail:
-              ", the platform's most-used investigation agent: an autonomous LLM works a packet capture end to end (protocol recon, DNS/HTTP/TLS, file carving, IOC extraction, timeline) into a cited report and triage verdict. It reasons only over the output of a real forensic toolchain it drives (tshark, Zeek, foremost), never raw packets, so every value it reports traces to tool evidence.",
+              ". A shared agent harness supplies model construction, retries, structured-output repair, context management, tool guardrails, per-task budgets, and typed lifecycle events; each agent adds only its domain prompt, tools, state, and graph.",
           },
           {
-            lead: "Built PurpleHaze",
+            lead: "Kept long-running agents on task beyond a single context window",
             detail:
-              ", an autonomous penetration-testing product: a local LLM drives Metasploit and real offensive tooling through a full multi-step engagement, holds session state across long runs, and produces compliance-grade OWASP and NIST reports, with no human in the loop.",
+              ". As context fills or the model repeats a tool call, the harness condenses the run to its objective, completed work, and next steps; oversized tool results move to searchable files the agent reads on demand instead of resending them with every model call.",
           },
           {
-            lead: "Built the in-house agent runtime",
+            lead: "Prevented context overruns and truncated model turns from corrupting an agent run",
             detail:
-              " every analysis agent runs on (LangChain/LangGraph): context compaction that counts real tokens and fails closed instead of overflowing, plus tool-output eviction, loop detection, and per-run container sandboxing (fresh, network-isolated, self-reaping).",
+              ". Before every llama.cpp call, the harness renders and tokenizes the exact outgoing request and refuses any prompt, summary, or retry that won't fit. If generation hits its cap, it drops the partial turn before memory or tool execution and regenerates once.",
           },
           {
-            lead: "Built the Postgres-native job queue",
+            lead: "Gave understaffed critical-infrastructure teams on-demand packet forensics",
             detail:
-              " that replaced Celery for the platform's GPU, LLM, and sandbox jobs, so a burst of heavy AI work can't OOM an air-gapped box and any one job can be cancelled without killing its worker. It runs on atomic per-lane claiming (`SELECT FOR UPDATE SKIP LOCKED`), priority-FIFO ordering, dependency DAGs with cycle detection, and lock-free single-flight.",
+              " through the platform's most-used agent. It drives tshark, Zeek, and foremost from an IDS alert through protocol reconstruction, IOC extraction, file carving, and timeline analysis, then delivers a cited report and triage verdict for defenders to review.",
           },
           {
-            lead: "Built the local LLM serving stack",
+            lead: "Made the platform investigate on its own",
             detail:
-              " (llama.cpp behind llama-swap) with a byte-exact VRAM fit-proof: a Python model reproduces llama.cpp's KV-cache allocation to the exact byte across grouped-query attention, sliding-window layers, and per-K/V quantization, so a deployment's fit is proven in CI with no GPU or running server.",
+              ": a background reconciler decides which AI work should exist and queues it with no analyst click, completing nearly 17,000 PCAP investigations in its first two months. Each dispatch commits independently behind a durable resume cursor, and a user's click promotes an already-queued run ahead of all background work.",
           },
           {
-            lead: "Built GPU-memory admission control",
+            lead: "Shipped PurpleHaze",
             detail:
-              " so concurrent LLM jobs can't overcommit one card: a per-pool Postgres advisory lock admits a job only when its declared context-token cost fits the pool's live budget, and a runtime `READ COMMITTED` requirement makes a claimer that waited on the lock re-price against just-committed usage instead of a stale snapshot.",
+              ", an autonomous penetration-testing product covering reconnaissance, exploitation, web, and credential testing. Its Metasploit tool keeps modules, options, and Meterpreter sessions alive across model turns and context compaction, so a full engagement ends in OWASP and NIST reports.",
           },
           {
-            lead: "Built the agent that maps captured network activity to MITRE ATT&CK",
+            lead: "Replaced fixed LLM concurrency with token-priced GPU admission",
             detail:
-              ": capture-time validation rejects technique IDs the model hallucinates, and a measurable retrieval eval (Recall@k/MRR with regression floors) gates changes before any agent runs.",
+              ". Five fixed 131k-token llama.cpp slots became one 655k-token KV pool that holds any job mix whose declared context fits, from 7 concurrent 128k-context agents to 160 4k-token jobs, sized byte-exact against llama.cpp's KV-cache allocation.",
+          },
+          {
+            lead: "Kept long-running GPU and sandbox jobs independently cancellable",
+            detail:
+              " and returned in-flight work to a terminal state after crashes or hangs. The Postgres scheduler combines atomic `SELECT FOR UPDATE SKIP LOCKED` claims, interactive-first, per-customer fair-share ordering, per-run process isolation, heartbeats, and process-tree cancellation.",
           },
         ],
       },
@@ -110,78 +113,42 @@ export const resumeVariants: Record<ResumeFocus, ResumeVariant> = {
         context: "",
         bullets: [
           {
-            lead: "Built a retrieval-augmented chatbot",
+            lead: "Made an NSF-funded Chesapeake Bay salinity corpus directly searchable",
             detail:
-              " for an NSF-funded Chesapeake Bay salinity project (SaltCast) at Horn Point Laboratory: FAISS retrieval over OpenAI embeddings feeding a streaming FastAPI/LangChain service; presented at the MIT Undergraduate Research Technology Conference.",
+              " through a retrieval-augmented chatbot, built on FAISS/OpenAI retrieval and a streaming FastAPI/LangChain service; presented at MIT URTC.",
           },
         ],
       },
     ],
     projects: [
       {
-        name: "BitNet b1.58 (from scratch)",
-        technologies: [
-          "PyTorch",
-          "ternary-weight LM",
-          "byte-level",
-          "Android",
-        ],
+        name: "docq",
+        technologies: ["Python", "SQLite/FTS5", "Ollama"],
         bullets: [
           {
-            lead: "Reimplemented and trained BitNet b1.58",
+            lead: "Created a cited retrieval engine",
             detail:
-              " ternary-weight ({−1, 0, +1}) language models from scratch at three sizes up to 300M parameters (byte-level, on enwik8/9), and deployed a trained checkpoint to an Android phone (Chaquopy), profiling on-device CPU, memory, and energy—undergraduate research on quantization-native models for edge inference.",
+              " that lets coding agents search a long reference instead of loading it into context. On a leakage-screened 266-case eval, hybrid BM25/vector retrieval reached 0.67 hit@1 and beat either channel alone; a skill-primed query-rewrite A/B raised it to 0.74 (p=0.0045).",
           },
         ],
       },
       {
-        name: "gloss",
-        technologies: ["Python", "SQLite/FTS5", "Ollama"],
+        name: "BitNet b1.58 (from scratch)",
+        technologies: ["PyTorch", "ternary-weight LM", "byte-level", "Android"],
         bullets: [
           {
-            lead: "Built a hybrid retrieval engine",
+            lead: "Trained ternary-weight ({−1, 0, +1}) language models from scratch",
             detail:
-              " that fuses BM25 with a local-embedding vector channel via reciprocal-rank fusion to return a source document's verbatim, cited passages—tuned against a 266-case evaluation gated by a paired significance test (hit@5 0.94, hit@1 0.71).",
+              " at three sizes up to 300M parameters, then deployed one to an Android phone and profiled on-device CPU, memory, and energy.",
           },
         ],
       },
     ],
-    honors: [honors.hackumbc, honors.bitcamp],
+    honors: [honors.bitcamp, honors.hackumbc],
     skills: [
-      {
-        label: "AI & LLM",
-        skills: [
-          "LangGraph/LangChain",
-          "llama.cpp",
-          "llama-swap",
-          "Ollama",
-          "OpenAI API",
-          "RAG",
-          "FAISS/vector search",
-          "model fine-tuning",
-          "LLM serving",
-          "GPU memory management",
-          "tiktoken",
-        ],
-      },
-      {
-        label: "Languages",
-        skills: ["Python", "Rust", "TypeScript", "SQL", "Bash"],
-      },
-      {
-        label: "Backend & Infrastructure",
-        skills: [
-          "Django",
-          "FastAPI",
-          "PostgreSQL",
-          "MongoDB",
-          "Redis",
-          "Celery",
-          "Docker",
-          "Linux",
-          "AWS",
-        ],
-      },
+      { label: "AI & agents", skills: ["Agent orchestration", "tool calling", "context engineering", "guardrails", "prompt-injection defense", "model evaluation", "RAG", "LLM serving", "LangChain", "LangGraph", "llama.cpp", "llama-swap", "Ollama", "OpenAI API", "PyTorch"] },
+      { label: "Languages", skills: ["Python", "Rust", "TypeScript", "SQL", "Bash"] },
+      { label: "Backend & infrastructure", skills: ["Django", "FastAPI", "PostgreSQL", "Redis", "Docker", "Linux", "AWS", "Terraform", "GitHub Actions"] },
     ],
   },
   "backend-platform": {
@@ -189,51 +156,54 @@ export const resumeVariants: Record<ResumeFocus, ResumeVariant> = {
     label: "Backend & Platform",
     shortLabel: "Backend",
     headline: "Backend systems built around explicit failure modes.",
-    introduction:
-      "Queues, crash isolation, GPU admission, cloud infrastructure, and durable local services—with the concurrency and recovery mechanics left visible.",
+    introduction: "Queues, crash isolation, GPU admission, cloud infrastructure, and durable local services—with the concurrency and recovery mechanics left visible.",
     pdf: "/spencer-presley-backend-platform-resume.pdf",
     experience: [
       {
         organization: "CrunchAtlas",
         role: "Software Engineer",
         dates: "Nov 2025 – Present",
-        context:
-          "Local-first, air-gapped AI security platform for critical infrastructure. Sole author of the systems below.",
+        context: "Local-first, air-gapped AI security platform for critical infrastructure. Sole author of the systems below.",
         bullets: [
           {
-            lead: "Built the Postgres-native job queue",
+            lead: "Replaced Celery with a Postgres-native job queue",
             detail:
-              " that replaced Celery for the platform's GPU, LLM, and sandbox jobs, so a burst of heavy AI work can't OOM an air-gapped box and any one job can be cancelled without killing its worker. It runs on atomic per-lane claiming (`SELECT FOR UPDATE SKIP LOCKED`), priority-FIFO ordering, dependency DAGs with cycle detection, and lock-free single-flight.",
+              " for the platform's GPU, LLM, sandbox, and document jobs, so any one job can be cancelled without killing its worker. Workers claim atomically with `SELECT FOR UPDATE SKIP LOCKED`, interactive work always runs ahead of background work, customers take fair-share turns, and dependency DAGs gate what is claimable.",
           },
           {
-            lead: "Engineered the queue's crash-isolation",
+            lead: "Made every job reach a terminal state even when its process dies",
             detail:
-              " so no job hangs non-terminal: each job runs in a spawned (not forked) supervisor that survives a segfault or OOM-kill and reaps the child's process group, while a heartbeat sweeper force-fails jobs whose supervisor dies or freezes (catching a frozen-but-alive one a PID check would miss). Chaos tests SIGKILL live supervisors and kill the database mid-job to prove it.",
+              ". Each runs under a spawned (not forked) supervisor that survives a segfault or OOM kill and reaps the child's process group, and a heartbeat sweeper fails jobs whose supervisor dies or freezes. Chaos tests SIGKILL live supervisors and kill the database mid-job.",
           },
           {
-            lead: "Built GPU-memory admission control",
+            lead: "Replaced fixed LLM concurrency with token-priced GPU admission",
             detail:
-              " so concurrent LLM jobs can't overcommit one card: a per-pool Postgres advisory lock admits a job only when its declared context-token cost fits the pool's live budget, and a runtime `READ COMMITTED` requirement makes a claimer that waited on the lock re-price against just-committed usage instead of a stale snapshot.",
+              ". Five fixed 131k-token llama.cpp slots became one 655k-token KV pool that holds 7 concurrent 128k-context agents or 160 4k-token jobs; a per-pool Postgres advisory lock admits a job only when its declared tokens fit, and a claimer that waited on the lock re-prices under `READ COMMITTED`.",
           },
           {
-            lead: "Built the in-house agent runtime",
+            lead: "Made the platform investigate on its own",
             detail:
-              " the platform's security agents run on (LangChain/LangGraph): context compaction that counts real tokens and fails closed instead of overflowing, plus tool-output eviction, loop detection, and per-run container sandboxing (fresh, network-isolated, self-reaping).",
+              ": a background reconciler queues the AI work that should exist with no analyst click, completing nearly 17,000 PCAP investigations in its first two months. Each dispatch commits independently behind a durable resume cursor, and a user's click promotes a queued run ahead of all background work.",
           },
           {
-            lead: "Built PurpleHaze",
+            lead: "Cut the Files page query from 12.3 s to 1.5 ms",
             detail:
-              ", an autonomous penetration-testing product: a local LLM drives Metasploit and real offensive tooling through a full multi-step engagement, holds session state across long runs, and produces compliance-grade OWASP and NIST reports, with no human in the loop.",
+              " on a 7.2M-row table by moving per-document alert counts into a summary table kept exact by statement-level Postgres triggers, with a reconcile job that repairs any drift.",
           },
           {
-            lead: "Sole owner of AtlasCyber's AWS",
+            lead: "Created the agent harness every security agent runs on",
             detail:
-              ", end to end across GovCloud and commercial partitions: EC2 (with a reverse-proxy/tunnel fleet), S3, IAM, VPC networking, and CloudFront.",
+              " (LangChain/LangGraph). Before each model call it tokenizes the exact outgoing request and compacts or refuses anything that won't fit; it also evicts oversized tool output, detects tool-call loops, and sandboxes each run in a network-isolated container.",
+          },
+          {
+            lead: "Own AtlasCyber's AWS across GovCloud and commercial partitions",
+            detail:
+              ", managed in Terraform: EC2 and its reverse-proxy/tunnel fleet, load balancers, WAF, S3, IAM, VPC networking, CloudWatch alarms, and CloudFront.",
           },
           {
             lead: "Rewrote the network-capture sensor from scratch in Rust",
             detail:
-              ", memory-safe workspace-wide (`#![forbid(unsafe_code)]`): a headless Linux daemon around a crash-safe SQLite-WAL upload queue that persists each capture before upload and survives a restart without dropping data, replacing the prior lossy in-memory queue.",
+              " (`#![forbid(unsafe_code)]` workspace-wide): a headless Linux daemon whose SQLite-WAL upload queue persists each capture before upload, so queued captures survive a restart instead of being lost with the old in-memory queue.",
           },
         ],
       },
@@ -241,26 +211,25 @@ export const resumeVariants: Record<ResumeFocus, ResumeVariant> = {
         organization: "CrunchAtlas",
         role: "Software Engineer, AtlasConnect",
         dates: "Mar 2025 – Nov 2025",
-        context:
-          "Sole developer and maintainer of an inherited codebase—Django REST, React/Vite, self-hosted LLM stack.",
+        context: "Sole developer and maintainer of an inherited codebase — Django REST, React/Vite, self-hosted LLM stack.",
         bullets: [
           {
-            lead: "Built the document-ingestion pipeline",
+            lead: "Turned pitch decks into structured deal fields",
             detail:
-              " for deal intake: multi-format extraction (PDF/DOCX/PPTX/DocSend) with selective parallel OCR on scanned pages, feeding concurrent LangChain chains under a managed token budget.",
+              " with a document-ingestion pipeline: PDF/DOCX/PPTX/DocSend extraction, parallel OCR only on pages without a text layer, and concurrent LangChain chains under a token budget.",
           },
         ],
       },
     ],
     projects: [
       {
-        name: "gloss",
+        name: "docq",
         technologies: ["Python", "SQLite/FTS5", "Ollama"],
         bullets: [
           {
-            lead: "Built a hybrid retrieval engine",
+            lead: "Created a cited retrieval engine",
             detail:
-              " that fuses BM25 with a local-embedding vector channel via reciprocal-rank fusion to return a source document's verbatim, cited passages, tuned against a 266-case evaluation gated by a paired significance test (hit@5 0.94, hit@1 0.71).",
+              " that lets coding agents search a long reference instead of loading it into context. On a 266-case eval, hybrid BM25/vector retrieval beat either channel alone at 0.67 hit@1; a query-rewrite A/B raised it to 0.74 (p=0.0045).",
           },
         ],
       },
@@ -269,54 +238,19 @@ export const resumeVariants: Record<ResumeFocus, ResumeVariant> = {
         technologies: ["Python", "Celery", "GDB", "LLDB", "Docker"],
         bullets: [
           {
-            lead: "Root-caused a Celery prefork fork-safety bug",
+            lead: "Traced a hanging Celery task to a fork-safety bug",
             detail:
-              " to the register level: a Rust-backed vector store initialized before `fork()` left the child inheriting a lock whose owner didn't survive the fork—a permanent futex deadlock on Linux (traced in GDB) and a libdispatch semaphore crash on macOS (traced in LLDB). One cause, two OS-level failure modes.",
+              ": a Rust-backed vector store initialized before `fork()` left the child holding a lock whose owner didn't survive the fork. Linux deadlocked on a futex (GDB); macOS crashed in libdispatch (LLDB).",
           },
         ],
       },
     ],
     honors: [honors.bitcamp, honors.hackumbc],
     skills: [
-      {
-        label: "Backend & Infrastructure",
-        skills: [
-          "Django",
-          "FastAPI",
-          "PostgreSQL",
-          "MongoDB",
-          "SQLite",
-          "Redis",
-          "Celery",
-          "Linux",
-          "AWS",
-        ],
-      },
-      {
-        label: "DevOps & CI/CD",
-        skills: [
-          "Docker (multi-stage, BuildKit)",
-          "GitHub Actions",
-          "Jenkins",
-          "supervisord",
-          "systemd",
-        ],
-      },
-      {
-        label: "Languages",
-        skills: ["Python", "Rust", "TypeScript", "SQL", "Bash"],
-      },
-      {
-        label: "AI & LLM",
-        skills: [
-          "LangGraph/LangChain",
-          "llama.cpp",
-          "llama-swap",
-          "Ollama",
-          "LLM serving",
-          "GPU memory management",
-        ],
-      },
+      { label: "Backend & infrastructure", skills: ["Django", "FastAPI", "PostgreSQL", "SQLite", "Redis", "Celery", "Linux", "AWS", "Terraform"] },
+      { label: "DevOps & CI/CD", skills: ["Docker (multi-stage, BuildKit)", "GitHub Actions", "Jenkins", "supervisord", "systemd"] },
+      { label: "Languages", skills: ["Python", "Rust", "TypeScript", "SQL", "Bash"] },
+      { label: "AI & LLM", skills: ["LangGraph/LangChain", "llama.cpp", "llama-swap", "Ollama", "LLM serving", "GPU capacity planning"] },
     ],
   },
 };
