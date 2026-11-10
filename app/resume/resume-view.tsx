@@ -16,9 +16,11 @@ import { siteContact } from "../site-data";
 import {
   type ResumeBullet,
   type ResumeFocus,
+  resumeEdgeWork,
   resumeEducation,
   resumeFocuses,
   resumeVariants,
+  skillLinks,
 } from "./resume-data";
 
 const resumeAtmosphere = pageAtmosphereStyles.resume;
@@ -210,7 +212,9 @@ export function ResumeView({
                         <h3 className="font-display text-2xl text-white">
                           {experience.organization}
                         </h3>
-                        <p className="text-sm text-sky-300">{experience.role}</p>
+                        <p className="text-sm text-sky-300">
+                          {experience.role}
+                        </p>
                       </div>
                       {experience.context ? (
                         <p className="mt-3 border-l border-zinc-700 pl-4 text-sm italic leading-6 text-zinc-400">
@@ -228,8 +232,22 @@ export function ResumeView({
               </div>
             </section>
 
-            <section aria-labelledby="projects-heading">
+            <section aria-labelledby="edge-heading">
               <SectionHeading index="02">
+                <span id="edge-heading">{resumeEdgeWork.title}</span>
+              </SectionHeading>
+              <p className="border-l border-zinc-700 pl-4 text-sm italic leading-6 text-zinc-400">
+                {resumeEdgeWork.context}
+              </p>
+              <ul className="mt-6 space-y-4 text-[0.95rem]">
+                {resumeEdgeWork.bullets.map((bullet) => (
+                  <Bullet key={bullet.lead} bullet={bullet} />
+                ))}
+              </ul>
+            </section>
+
+            <section aria-labelledby="projects-heading">
+              <SectionHeading index="03">
                 <span id="projects-heading">Selected projects</span>
               </SectionHeading>
               <div className="grid gap-4 md:grid-cols-2">
@@ -255,7 +273,7 @@ export function ResumeView({
             </section>
 
             <section aria-labelledby="honors-heading">
-              <SectionHeading index="03">
+              <SectionHeading index="04">
                 <span id="honors-heading">Honors</span>
               </SectionHeading>
               <ul className="grid gap-4 sm:grid-cols-2">
@@ -337,14 +355,27 @@ export function ResumeView({
                       {group.label}
                     </h3>
                     <ul className="mt-3 flex flex-wrap gap-2">
-                      {group.skills.map((skill) => (
-                        <li
-                          key={skill}
-                          className="rounded-md border border-zinc-800 bg-zinc-900/70 px-2.5 py-1.5 text-xs leading-4 text-zinc-400"
-                        >
-                          {skill}
-                        </li>
-                      ))}
+                      {group.skills.map((skill) => {
+                        const href = skillLinks[skill];
+                        const chip =
+                          "block rounded-md border border-zinc-800 bg-zinc-900/70 px-2.5 py-1.5 text-xs leading-4 text-zinc-400";
+                        return (
+                          <li key={skill}>
+                            {href ? (
+                              <a
+                                href={href}
+                                target="_blank"
+                                rel="noreferrer"
+                                className={`${chip} transition hover:border-zinc-600 hover:text-sky-300`}
+                              >
+                                {skill}
+                              </a>
+                            ) : (
+                              <span className={chip}>{skill}</span>
+                            )}
+                          </li>
+                        );
+                      })}
                     </ul>
                   </div>
                 ))}

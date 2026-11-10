@@ -49,20 +49,251 @@ const honors = {
   hackumbc: "Best Educational Hack & 2nd Overall — HackUMBC 2024 — Testif.AI",
 };
 
+export type ResumeSection = {
+  title: string;
+  context: string;
+  bullets: ResumeBullet[];
+};
+
+// Site-only: the edge/networking work behind the platform. Not on the one-page
+// PDFs; shown on both resume tabs.
+export const resumeEdgeWork: ResumeSection = {
+  title: "Edge & networking",
+  context:
+    "CrunchAtlas: how the platform's on-prem GPU boxes are reached from the internet, all declared in Terraform.",
+  bullets: [
+    {
+      lead: "Exposed on-prem boxes without opening a single inbound port",
+      detail:
+        ". A remotely managed Cloudflare Tunnel (`cloudflared`, outbound-only) carries traffic from Cloudflare's edge, where DNS, TLS, WAF rules, and bot management are declared in Terraform; the box holds only the daemon and its token.",
+    },
+    {
+      lead: "Built a reusable AWS edge module",
+      detail:
+        ": an ALB terminates TLS behind a US-only WAF with a per-IP login rate limit and forwards to a single nginx bastion that reaches the on-box app over WireGuard. The whole bastion (packages, firewalld, WireGuard, nginx, journald, a tunnel probe) renders from Terraform user data, and plan-only `terraform test` runs cover it against mocked AWS.",
+    },
+    {
+      lead: "Adopted two hand-built SSH reverse-tunnel edges into Terraform",
+      detail:
+        " with import blocks, exactly as they were, then hardened them one reviewed plan at a time: dedicated ALB security groups, WAF, Elastic IPs, VPC flow logs, CloudWatch health alarms, and certificate-expiry alerts through EventBridge and SNS.",
+    },
+    {
+      lead: "Versioned every box's host config in the repo",
+      detail:
+        " (systemd units, supervisord-managed tunnels, firewall rules, WireGuard), with a deploy-time drift gate that fails the deploy when a box has diverged from what is committed.",
+    },
+  ],
+};
+
+// Skill chips link out when an entry exists here.
+export const skillLinks: Record<string, string> = {
+  Python: "https://www.python.org",
+  Rust: "https://www.rust-lang.org",
+  TypeScript: "https://www.typescriptlang.org",
+  Bash: "https://www.gnu.org/software/bash/",
+  LangChain: "https://www.langchain.com",
+  LangGraph: "https://www.langchain.com/langgraph",
+  "llama.cpp": "https://github.com/ggml-org/llama.cpp",
+  "llama-swap": "https://github.com/mostlygeek/llama-swap",
+  Ollama: "https://ollama.com",
+  "OpenAI API": "https://platform.openai.com/docs",
+  PyTorch: "https://pytorch.org",
+  Django: "https://www.djangoproject.com",
+  "Django Ninja": "https://django-ninja.dev",
+  FastAPI: "https://fastapi.tiangolo.com",
+  PostgreSQL: "https://www.postgresql.org",
+  SQLite: "https://sqlite.org",
+  Redis: "https://redis.io",
+  Celery: "https://docs.celeryq.dev",
+  Linux: "https://www.kernel.org",
+  EC2: "https://aws.amazon.com/ec2/",
+  "RDS for PostgreSQL": "https://aws.amazon.com/rds/postgresql/",
+  S3: "https://aws.amazon.com/s3/",
+  "CloudFront (VPC origins, Functions)": "https://aws.amazon.com/cloudfront/",
+  "Application Load Balancer":
+    "https://aws.amazon.com/elasticloadbalancing/application-load-balancer/",
+  WAF: "https://aws.amazon.com/waf/",
+  "Certificate Manager": "https://aws.amazon.com/certificate-manager/",
+  "Route 53": "https://aws.amazon.com/route53/",
+  "VPC (NAT, endpoints, flow logs)": "https://aws.amazon.com/vpc/",
+  "IAM (GitHub OIDC)": "https://aws.amazon.com/iam/",
+  ECR: "https://aws.amazon.com/ecr/",
+  "Systems Manager (Parameter Store, Run Command)":
+    "https://aws.amazon.com/systems-manager/",
+  CloudWatch: "https://aws.amazon.com/cloudwatch/",
+  EventBridge: "https://aws.amazon.com/eventbridge/",
+  SNS: "https://aws.amazon.com/sns/",
+  "GovCloud (US)": "https://aws.amazon.com/govcloud-us/",
+  "Cloudflare Tunnel":
+    "https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/",
+  "Cloudflare WAF": "https://developers.cloudflare.com/waf/",
+  nginx: "https://nginx.org",
+  WireGuard: "https://www.wireguard.com",
+  "SSH reverse tunnels": "https://www.openssh.com",
+  firewalld: "https://firewalld.org",
+  "Terraform (modules, import blocks, terraform test)":
+    "https://developer.hashicorp.com/terraform",
+  "GitHub Actions (self-hosted runners, reusable workflows, OIDC)":
+    "https://docs.github.com/actions",
+  "Docker (multi-stage, BuildKit cache mounts)": "https://docs.docker.com",
+  "Docker Compose (profiles, healthchecks, NVIDIA GPU)":
+    "https://docs.docker.com/compose/",
+  Jenkins: "https://www.jenkins.io",
+  supervisord: "http://supervisord.org",
+  systemd: "https://systemd.io",
+  uv: "https://docs.astral.sh/uv/",
+  Ruff: "https://docs.astral.sh/ruff/",
+  Semgrep: "https://semgrep.dev",
+  actionlint: "https://github.com/rhysd/actionlint",
+  "pip-audit": "https://github.com/pypa/pip-audit",
+  Tokio: "https://tokio.rs",
+  Tauri: "https://tauri.app",
+  axum: "https://github.com/tokio-rs/axum",
+  rusqlite: "https://github.com/rusqlite/rusqlite",
+  libpcap: "https://www.tcpdump.org",
+  Clippy: "https://doc.rust-lang.org/clippy/",
+  "cargo-deny": "https://embarkstudios.github.io/cargo-deny/",
+  "cargo-deb": "https://github.com/kornelski/cargo-deb",
+  React: "https://react.dev",
+  "Next.js": "https://nextjs.org",
+  Vite: "https://vite.dev",
+  "TanStack Query": "https://tanstack.com/query",
+  orval: "https://orval.dev",
+  "Tailwind CSS": "https://tailwindcss.com",
+  Playwright: "https://playwright.dev",
+};
+
+const skillGroups = {
+  ai: {
+    label: "AI & agents",
+    skills: [
+      "Agent orchestration",
+      "tool calling",
+      "context engineering",
+      "guardrails",
+      "prompt-injection defense",
+      "model evaluation",
+      "RAG",
+      "LLM serving",
+      "GPU capacity planning",
+      "LangChain",
+      "LangGraph",
+      "llama.cpp",
+      "llama-swap",
+      "Ollama",
+      "OpenAI API",
+      "PyTorch",
+    ],
+  },
+  languages: {
+    label: "Languages",
+    skills: ["Python", "Rust", "TypeScript", "SQL", "Bash"],
+  },
+  backend: {
+    label: "Backend & data",
+    skills: [
+      "Django",
+      "Django Ninja",
+      "FastAPI",
+      "PostgreSQL",
+      "SQLite",
+      "Redis",
+      "Celery",
+      "Linux",
+    ],
+  },
+  aws: {
+    label: "AWS",
+    skills: [
+      "EC2",
+      "RDS for PostgreSQL",
+      "S3",
+      "CloudFront (VPC origins, Functions)",
+      "Application Load Balancer",
+      "WAF",
+      "Certificate Manager",
+      "Route 53",
+      "VPC (NAT, endpoints, flow logs)",
+      "IAM (GitHub OIDC)",
+      "ECR",
+      "Systems Manager (Parameter Store, Run Command)",
+      "CloudWatch",
+      "EventBridge",
+      "SNS",
+      "GovCloud (US)",
+    ],
+  },
+  edge: {
+    label: "Edge & networking",
+    skills: [
+      "Cloudflare Tunnel",
+      "Cloudflare WAF",
+      "nginx",
+      "WireGuard",
+      "SSH reverse tunnels",
+      "firewalld",
+    ],
+  },
+  delivery: {
+    label: "IaC, CI/CD & containers",
+    skills: [
+      "Terraform (modules, import blocks, terraform test)",
+      "GitHub Actions (self-hosted runners, reusable workflows, OIDC)",
+      "Docker (multi-stage, BuildKit cache mounts)",
+      "Docker Compose (profiles, healthchecks, NVIDIA GPU)",
+      "Jenkins",
+      "supervisord",
+      "systemd",
+      "uv",
+      "Ruff",
+      "Semgrep",
+      "actionlint",
+      "pip-audit",
+    ],
+  },
+  rust: {
+    label: "Rust & systems",
+    skills: [
+      "Tokio",
+      "Tauri",
+      "axum",
+      "rusqlite",
+      "libpcap",
+      "Clippy",
+      "cargo-deny",
+      "cargo-deb",
+    ],
+  },
+  frontend: {
+    label: "Frontend",
+    skills: [
+      "React",
+      "Next.js",
+      "Vite",
+      "TanStack Query",
+      "orval",
+      "Tailwind CSS",
+      "Playwright",
+    ],
+  },
+} satisfies Record<string, ResumeSkillGroup>;
+
 export const resumeVariants: Record<ResumeFocus, ResumeVariant> = {
   "ai-llm": {
     id: "ai-llm",
     label: "AI & LLM Systems",
     shortLabel: "AI / LLM",
     headline: "AI systems, grounded in the machinery underneath.",
-    introduction: "Agent runtimes, local model serving, GPU admission, and evidence-grounded products—built as production systems rather than model demos.",
+    introduction:
+      "Agent runtimes, local model serving, GPU admission, and evidence-grounded products—built as production systems rather than model demos.",
     pdf: "/spencer-presley-ai-llm-resume.pdf",
     experience: [
       {
         organization: "CrunchAtlas",
         role: "Software Engineer",
         dates: "Mar 2025 – Present",
-        context: "Local-first, air-gapped AI security platform for critical infrastructure. Sole author of the systems below.",
+        context:
+          "Local-first, air-gapped AI security platform for critical infrastructure. Sole author of the systems below.",
         bullets: [
           {
             lead: "Created the company's agent platform from scratch",
@@ -146,9 +377,14 @@ export const resumeVariants: Record<ResumeFocus, ResumeVariant> = {
     ],
     honors: [honors.bitcamp, honors.hackumbc],
     skills: [
-      { label: "AI & agents", skills: ["Agent orchestration", "tool calling", "context engineering", "guardrails", "prompt-injection defense", "model evaluation", "RAG", "LLM serving", "LangChain", "LangGraph", "llama.cpp", "llama-swap", "Ollama", "OpenAI API", "PyTorch"] },
-      { label: "Languages", skills: ["Python", "Rust", "TypeScript", "SQL", "Bash"] },
-      { label: "Backend & infrastructure", skills: ["Django", "FastAPI", "PostgreSQL", "Redis", "Docker", "Linux", "AWS", "Terraform", "GitHub Actions"] },
+      skillGroups.ai,
+      skillGroups.languages,
+      skillGroups.backend,
+      skillGroups.aws,
+      skillGroups.edge,
+      skillGroups.delivery,
+      skillGroups.rust,
+      skillGroups.frontend,
     ],
   },
   "backend-platform": {
@@ -156,14 +392,16 @@ export const resumeVariants: Record<ResumeFocus, ResumeVariant> = {
     label: "Backend & Platform",
     shortLabel: "Backend",
     headline: "Backend systems built around explicit failure modes.",
-    introduction: "Queues, crash isolation, GPU admission, cloud infrastructure, and durable local services—with the concurrency and recovery mechanics left visible.",
+    introduction:
+      "Queues, crash isolation, GPU admission, cloud infrastructure, and durable local services—with the concurrency and recovery mechanics left visible.",
     pdf: "/spencer-presley-backend-platform-resume.pdf",
     experience: [
       {
         organization: "CrunchAtlas",
         role: "Software Engineer",
         dates: "Nov 2025 – Present",
-        context: "Local-first, air-gapped AI security platform for critical infrastructure. Sole author of the systems below.",
+        context:
+          "Local-first, air-gapped AI security platform for critical infrastructure. Sole author of the systems below.",
         bullets: [
           {
             lead: "Replaced Celery with a Postgres-native job queue",
@@ -211,7 +449,8 @@ export const resumeVariants: Record<ResumeFocus, ResumeVariant> = {
         organization: "CrunchAtlas",
         role: "Software Engineer, AtlasConnect",
         dates: "Mar 2025 – Nov 2025",
-        context: "Sole developer and maintainer of an inherited codebase — Django REST, React/Vite, self-hosted LLM stack.",
+        context:
+          "Sole developer and maintainer of an inherited codebase — Django REST, React/Vite, self-hosted LLM stack.",
         bullets: [
           {
             lead: "Turned pitch decks into structured deal fields",
@@ -247,10 +486,14 @@ export const resumeVariants: Record<ResumeFocus, ResumeVariant> = {
     ],
     honors: [honors.bitcamp, honors.hackumbc],
     skills: [
-      { label: "Backend & infrastructure", skills: ["Django", "FastAPI", "PostgreSQL", "SQLite", "Redis", "Celery", "Linux", "AWS", "Terraform"] },
-      { label: "DevOps & CI/CD", skills: ["Docker (multi-stage, BuildKit)", "GitHub Actions", "Jenkins", "supervisord", "systemd"] },
-      { label: "Languages", skills: ["Python", "Rust", "TypeScript", "SQL", "Bash"] },
-      { label: "AI & LLM", skills: ["LangGraph/LangChain", "llama.cpp", "llama-swap", "Ollama", "LLM serving", "GPU capacity planning"] },
+      skillGroups.backend,
+      skillGroups.aws,
+      skillGroups.edge,
+      skillGroups.delivery,
+      skillGroups.languages,
+      skillGroups.rust,
+      skillGroups.ai,
+      skillGroups.frontend,
     ],
   },
 };
