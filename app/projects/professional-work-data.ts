@@ -1,6 +1,9 @@
-export type ProfessionalWorkSlug = "crunchatlas" | "atlasconnect";
+export type ProfessionalWorkSlug =
+	| "crunchatlas"
+	| "purplehaze"
+	| "atlasconnect";
 
-export type ProfessionalWorkAccent = "amber" | "sky";
+export type ProfessionalWorkAccent = "amber" | "sky" | "violet";
 
 export type ProfessionalWorkImage = {
 	src: string;
@@ -43,9 +46,9 @@ export const professionalWork = {
 		category: "Local AI and security systems",
 		headline: "Reliable local AI where cloud assumptions break.",
 		summary:
-			"I build the AI and backend infrastructure behind AtlasCyber: evidence-grounded agents, governed local inference, durable work orchestration, and isolated execution across cloud, on-prem, and air-gapped environments.",
-		lead: "I build the systems that keep long-running security agents bounded, observable, and useful on local hardware. I also built PurpleHaze end to end.",
-		role: "I built PurpleHaze end to end and most of AtlasCyber's AI and backend platform, including the systems described here. I also own AtlasCyber's AWS across GovCloud and commercial partitions.",
+			"I build the AI and backend infrastructure behind AtlasCyber and the agent platform its built-in analyst, ClemAI, runs on: local model serving, token-priced GPU admission, a Postgres job queue, autonomous investigation, and the AWS and edge that reach on-prem and air-gapped boxes.",
+		lead: "I build the systems that keep long-running security agents bounded, observable, and useful on a single local GPU. The platform has completed nearly 17,000 packet-capture investigations on its own, with no analyst click. I also built PurpleHaze's product layer end to end.",
+		role: "Most of AtlasCyber's AI and backend platform, including every system described here, and every PurpleHaze-specific component. I also own AtlasCyber's AWS across GovCloud and commercial partitions, managed in Terraform.",
 		accent: "amber",
 		external: {
 			label: "Visit CrunchAtlas",
@@ -67,8 +70,35 @@ export const professionalWork = {
 			? {
 					src: "/projects/crunchatlas-campaign-assessment.webp",
 					alt: "Public CrunchAtlas marketing view showing a network security campaign summary",
-				}
+			  }
 			: undefined,
+	},
+	purplehaze: {
+		slug: "purplehaze",
+		href: "/projects/purplehaze",
+		title: "PurpleHaze",
+		cardTitle: "PurpleHaze",
+		eyebrow: "CrunchAtlas product",
+		period: "2025–",
+		category: "Autonomous penetration testing",
+		headline: "A local model that runs a scoped pentest.",
+		summary:
+			"PurpleHaze tests authorized IT attack paths with a self-hosted LLM driving real offensive tooling, then turns the evidence into OWASP, NIST, and executive reports. I built every PurpleHaze-specific component.",
+		lead: "PurpleHaze points a self-hosted model at approved IT targets and lets it work through reconnaissance, exploitation, web, and credential testing with real tools, keeping live Metasploit sessions alive across turns, then turns what it recorded into structured compliance reports.",
+		role: "Sole author of PurpleHaze's product layer: the agent workflows, tool layer, OpenVAS pipeline and host discovery, report generation, pentest container, and UI. It runs on the AtlasCyber platform it was forked from, including agent and queue infrastructure I also built.",
+		accent: "violet",
+		external: {
+			label: "PurpleHaze on crunchatlas.com",
+			href: "https://www.crunchatlas.com/purplehaze",
+		},
+		previewSteps: [
+			"Discover and scan targets",
+			"Agent-driven workflows",
+			"Persistent Metasploit state",
+			"OWASP, NIST, and executive reports",
+		],
+		flow: ["Discover and scan", "Agent workflow", "Structured findings", "Report"],
+		image: undefined,
 	},
 	atlasconnect: {
 		slug: "atlasconnect",

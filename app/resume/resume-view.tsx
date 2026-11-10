@@ -278,11 +278,17 @@ export function ResumeView({
               </SectionHeading>
               <ul className="grid gap-4 sm:grid-cols-2">
                 {resume.honors.map((honor) => (
-                  <li
-                    key={honor}
-                    className="rounded-2xl border border-zinc-800 px-5 py-4 text-sm leading-6 text-zinc-300"
-                  >
-                    {honor}
+                  <li key={honor.text}>
+                    <Link
+                      href={honor.href}
+                      className="group flex h-full items-start justify-between gap-3 rounded-2xl border border-zinc-800 px-5 py-4 text-sm leading-6 text-zinc-300 transition hover:border-zinc-600 hover:text-white"
+                    >
+                      {honor.text}
+                      <ArrowUpRight
+                        className="mt-1 h-4 w-4 shrink-0 text-zinc-600 transition group-hover:text-sky-300"
+                        aria-hidden="true"
+                      />
+                    </Link>
                   </li>
                 ))}
               </ul>

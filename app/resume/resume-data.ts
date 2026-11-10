@@ -24,6 +24,11 @@ export type ResumeSkillGroup = {
   skills: string[];
 };
 
+export type ResumeHonor = {
+  text: string;
+  href: string;
+};
+
 export type ResumeVariant = {
   id: ResumeFocus;
   label: string;
@@ -33,7 +38,7 @@ export type ResumeVariant = {
   pdf: string;
   experience: ResumeExperience[];
   projects: ResumeProject[];
-  honors: string[];
+  honors: ResumeHonor[];
   skills: ResumeSkillGroup[];
 };
 
@@ -44,10 +49,15 @@ export const resumeEducation = {
 };
 
 const honors = {
-  bitcamp:
-    "1st Place / Best Hack — Bitcamp 2024, UMD (largest US East Coast hackathon) — TermBook",
-  hackumbc: "Best Educational Hack & 2nd Overall — HackUMBC 2024 — Testif.AI",
-};
+  bitcamp: {
+    text: "1st Place / Best Hack — Bitcamp 2024, UMD (largest US East Coast hackathon) — TermBook",
+    href: "/projects/termbook",
+  },
+  hackumbc: {
+    text: "Best Educational Hack & 2nd Overall — HackUMBC 2024 — Testif.AI",
+    href: "/projects/testifai",
+  },
+} satisfies Record<string, ResumeHonor>;
 
 export type ResumeSection = {
   title: string;

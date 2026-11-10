@@ -27,6 +27,14 @@ const accentStyles = {
 		dot: "bg-sky-300",
 		ring: "focus-visible:ring-sky-400",
 	},
+	violet: {
+		wash: "bg-[radial-gradient(circle_at_16%_0%,rgba(139,92,246,0.18),transparent_38%),radial-gradient(circle_at_84%_12%,rgba(217,70,239,0.11),transparent_34%)]",
+		text: "text-violet-300",
+		border: "border-violet-400/20",
+		soft: "bg-violet-400/10",
+		dot: "bg-violet-300",
+		ring: "focus-visible:ring-violet-400",
+	},
 } as const satisfies Record<
 	ProfessionalWorkAccent,
 	{
@@ -266,13 +274,18 @@ export function MarketingShot({
 	);
 }
 
+const nextCaseStudy: Record<ProfessionalWorkSlug, ProfessionalWorkSlug> = {
+	crunchatlas: "atlasconnect",
+	purplehaze: "crunchatlas",
+	atlasconnect: "crunchatlas",
+};
+
 export function ProfessionalCaseStudyFooter({
 	current,
 }: {
 	current: ProfessionalWorkSlug;
 }) {
-	const nextSlug: ProfessionalWorkSlug =
-		current === "crunchatlas" ? "atlasconnect" : "crunchatlas";
+	const nextSlug = nextCaseStudy[current];
 	const next = getProfessionalWork(nextSlug);
 
 	return (
