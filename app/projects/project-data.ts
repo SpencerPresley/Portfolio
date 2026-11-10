@@ -129,7 +129,7 @@ export const projects: readonly Project[] = [
 		facts: [
 			{ label: "Artifact", value: "One portable SQLite database" },
 			{ label: "Retrieval", value: "BM25 + local vectors + RRF" },
-			{ label: "Evaluation", value: "266 rank-sensitive cases" },
+			{ label: "Evaluation", value: "266 cases · hit@1 0.67 → 0.74" },
 		],
 		flow: [
 			"Source text",
@@ -185,7 +185,7 @@ export const projects: readonly Project[] = [
 			},
 		],
 		outcome:
-			"A working open-source prototype that builds a cited corpus end to end, runs locally, and has a measurable path for deciding whether a retrieval change actually helped.",
+			"A local engine that builds a cited corpus end to end and decides retrieval changes on evidence: on the 266-case eval, hybrid retrieval beats either channel alone at 0.67 hit@1, and a query-rewrite instruction raised it to 0.74 (p=0.0045) while the paired test showed the cases it made worse.",
 	},
 	{
 		slug: "celery-fork-safety",
@@ -953,7 +953,7 @@ export const projects: readonly Project[] = [
 			},
 		],
 		outcome:
-			"A research assistant that shipped inside SaltCast and was presented as part of the work at the MIT Undergraduate Research Technology Conference. The original product surface is no longer maintained, so this page preserves the work as an archived case study.",
+			"A research assistant that shipped inside SaltCast and was presented at the MIT Undergraduate Research Technology Conference. The product is no longer maintained; this page keeps the engineering record.",
 	},
 	{
 		slug: "testifai",
@@ -1030,7 +1030,7 @@ export const projects: readonly Project[] = [
 			},
 		],
 		outcome:
-			"The project won Best Educational Hack and placed second overall at HackUMBC 2024. The public repository remains available as an archived snapshot of the build.",
+			"Testif.AI won Best Educational Hack and placed second overall at HackUMBC 2024. The repository is public.",
 	},
 	{
 		slug: "termbook",
@@ -1109,11 +1109,30 @@ export const projects: readonly Project[] = [
 			},
 		],
 		outcome:
-			"TermBook won first place / Best Hack at Bitcamp 2024. The original live domain is no longer active, so the portfolio links to the surviving source rather than pretending the deployment still exists.",
+			"TermBook won first place / Best Hack at Bitcamp 2024, the largest hackathon on the US East Coast. The original domain has lapsed; the source is public.",
 	},
 ];
 
 export const openSourceContributions: readonly OpenSourceContribution[] = [
+	{
+		project: "codex-plugin-cc (maintained fork)",
+		year: "2026",
+		eyebrow: "Claude Code × Codex delegation",
+		summary:
+			'Maintain a fork of OpenAI\'s Codex plugin for Claude Code that makes delegated reviews and tasks durable and honest. A review that never finished now reports no verdict instead of its last interim "approve"; a recorded shared broker is checked by pid and socket instead of trusted on sight; ending a Claude session keeps finished results; and every command collapsed into skills, so the plugin occupies less standing context.',
+		credit:
+			"Fork of openai/codex-plugin-cc (Apache-2.0). The changes above are Spencer's, released through 1.0.13 with a per-release changelog.",
+		links: [
+			{
+				label: "GitHub",
+				href: "https://github.com/SpencerPresley/codex-plugin-cc",
+			},
+			{
+				label: "Changelog",
+				href: "https://github.com/SpencerPresley/codex-plugin-cc/blob/main/plugins/codex/CHANGELOG.md",
+			},
+		],
+	},
 	{
 		project: "mnemex",
 		year: "2026",
