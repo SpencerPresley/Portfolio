@@ -51,6 +51,10 @@ for f in public/*.pdf; do pdftotext "$f" - | grep -q '[0-9]\{3\}-[0-9]\{3\}-[0-9
 `app/resume/resume-data.ts` mirrors the same two markdown sources (lead = the
 bolded opening clause of each bullet); update it in the same change.
 
+Two parts are site-only and intentionally richer than the PDFs: the skill
+groups (`skillGroups`, with outbound links in `skillLinks`) and the
+`resumeEdgeWork` section (Edge & networking), shown on both tabs.
+
 The last copy preserves the original public URL for old links while making the
 AI/LLM resume the default download.
 
