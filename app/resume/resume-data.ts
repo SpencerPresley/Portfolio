@@ -45,7 +45,7 @@ export type ResumeVariant = {
 export const resumeEducation = {
   institution: "Salisbury University",
   degree: "B.S. Computer Science, Minor in Mathematics",
-  dates: "Aug 2021 – May 2025",
+  dates: "May 2025",
 };
 
 const honors = {
@@ -107,6 +107,16 @@ export const skillLinks: Record<string, string> = {
   "llama-swap": "https://github.com/mostlygeek/llama-swap",
   Ollama: "https://ollama.com",
   "OpenAI API": "https://platform.openai.com/docs",
+  "Anthropic API (prompt caching)":
+    "https://docs.claude.com/en/docs/build-with-claude/prompt-caching",
+  Pydantic: "https://docs.pydantic.dev",
+  NumPy: "https://numpy.org",
+  "Django REST Framework": "https://www.django-rest-framework.org",
+  Lambda: "https://aws.amazon.com/lambda/",
+  SES: "https://aws.amazon.com/ses/",
+  Amplify: "https://aws.amazon.com/amplify/",
+  Zod: "https://zod.dev",
+  Lua: "https://www.lua.org",
   PyTorch: "https://pytorch.org",
   Django: "https://www.djangoproject.com",
   "Django Ninja": "https://django-ninja.dev",
@@ -192,17 +202,22 @@ const skillGroups = {
       "llama-swap",
       "Ollama",
       "OpenAI API",
+      "Anthropic API (prompt caching)",
+      "Pydantic",
+      "model fine-tuning",
       "PyTorch",
+      "NumPy",
     ],
   },
   languages: {
     label: "Languages",
-    skills: ["Python", "Rust", "TypeScript", "SQL", "Bash"],
+    skills: ["Python", "Rust", "TypeScript", "SQL", "Bash", "Lua"],
   },
   backend: {
     label: "Backend & data",
     skills: [
       "Django",
+      "Django REST Framework",
       "Django Ninja",
       "FastAPI",
       "PostgreSQL",
@@ -226,6 +241,9 @@ const skillGroups = {
       "VPC (NAT, endpoints, flow logs)",
       "IAM (GitHub OIDC)",
       "ECR",
+      "Lambda",
+      "SES",
+      "Amplify",
       "Systems Manager (Parameter Store, Run Command)",
       "CloudWatch",
       "EventBridge",
@@ -282,6 +300,7 @@ const skillGroups = {
       "Vite",
       "TanStack Query",
       "orval",
+      "Zod",
       "Tailwind CSS",
       "Playwright",
     ],
@@ -308,7 +327,7 @@ export const resumeVariants: Record<ResumeFocus, ResumeVariant> = {
           {
             lead: "Created the company's agent platform from scratch.",
             detail:
-              " A shared harness supplies model construction, retries, structured-output repair, context management, tool guardrails, per-task budgets, and typed lifecycle events; each agent adds only its domain prompt, tools, state, and graph.",
+              " A shared harness supplies model construction, retries, structured-output repair, context management, tool guardrails, per-task budgets, LangGraph-checkpointed run state, and typed lifecycle events; each agent adds only its domain prompt, tools, state, and graph.",
           },
           {
             lead: "Kept long agent runs inside a bounded context.",
@@ -323,7 +342,7 @@ export const resumeVariants: Record<ResumeFocus, ResumeVariant> = {
           {
             lead: "Made the platform investigate on its own",
             detail:
-              ", completing nearly 17,000 PCAP investigations in its first two months with no analyst click. A background reconciler decides which AI work should exist and queues it; each dispatch commits independently behind a durable resume cursor.",
+              ", completing nearly 17,000 PCAP investigations in its first two months with no analyst click. A background reconciler decides which AI work should exist and queues it, recording its progress durably so a crash loses nothing already queued.",
           },
           {
             lead: "Shipped PurpleHaze",
@@ -331,9 +350,9 @@ export const resumeVariants: Record<ResumeFocus, ResumeVariant> = {
               ", an autonomous penetration-testing product covering reconnaissance, exploitation, web, and credential testing. Its Metasploit tool keeps modules, options, and Meterpreter sessions alive across model turns and context compaction, so a full engagement ends in OWASP and NIST reports.",
           },
           {
-            lead: "Replaced fixed LLM concurrency with token-priced GPU admission.",
+            lead: "Replaced fixed LLM concurrency with token-budgeted GPU scheduling.",
             detail:
-              " Five fixed 131k-token llama.cpp slots became one 655k-token KV pool that holds any job mix whose declared context fits, from 7 concurrent 128k-context agents to 160 4k-token jobs, sized byte-exact against llama.cpp's KV cache.",
+              " Five fixed 131k-token llama.cpp slots became one 655k-token KV-cache pool that holds any job mix whose declared context fits, from 7 concurrent 128k-context agents to 160 4k-token jobs, sized byte-exact against llama.cpp's KV cache.",
           },
           {
             lead: "Kept long-running GPU and sandbox jobs independently cancellable",
@@ -351,7 +370,7 @@ export const resumeVariants: Record<ResumeFocus, ResumeVariant> = {
           {
             lead: "Made an NSF-funded Chesapeake Bay salinity corpus searchable",
             detail:
-              " through a retrieval-augmented chatbot, built on FAISS/OpenAI retrieval and a streaming FastAPI/LangChain service; presented at MIT URTC.",
+              " through a RAG chatbot (FAISS, OpenAI, streaming FastAPI/LangChain); presented at the MIT Undergraduate Research Technology Conference.",
           },
         ],
       },
@@ -364,7 +383,7 @@ export const resumeVariants: Record<ResumeFocus, ResumeVariant> = {
           {
             lead: "Created a cited retrieval engine",
             detail:
-              " that lets coding agents search a long reference instead of loading all of it. On a leakage-screened 266-case eval, hybrid BM25/vector retrieval reached 0.67 hit@1 and beat either channel alone; a skill-primed query-rewrite A/B raised it to 0.74 (p=0.0045).",
+              " that lets coding agents search a long reference instead of loading all of it. On a leakage-screened 266-case eval, hybrid BM25/vector retrieval reached 0.67 hit@1 and beat either channel alone; a instruction-based query-rewrite A/B raised it to 0.74 (p=0.0045).",
           },
         ],
       },
@@ -419,17 +438,17 @@ export const resumeVariants: Record<ResumeFocus, ResumeVariant> = {
               " Each runs under a spawned (not forked) supervisor that survives a segfault or OOM kill and reaps the child's process group, and a heartbeat sweeper fails jobs whose supervisor dies or freezes. Chaos tests SIGKILL live supervisors and kill the database mid-job.",
           },
           {
-            lead: "Replaced fixed LLM concurrency with token-priced GPU admission.",
+            lead: "Replaced fixed LLM concurrency with token-budgeted GPU scheduling.",
             detail:
-              " Five fixed 131k-token llama.cpp slots became one 655k-token KV pool that holds 7 concurrent 128k-context agents or 160 4k-token jobs; a per-pool Postgres advisory lock admits a job only when its tokens fit, re-pricing under `READ COMMITTED` after any wait.",
+              " Five fixed 131k-token llama.cpp slots became one 655k-token KV-cache pool that holds 7 concurrent 128k-context agents or 160 4k-token jobs; a per-pool Postgres advisory lock admits a job only when its tokens fit, re-pricing under `READ COMMITTED` after any wait.",
           },
           {
             lead: "Made the platform investigate on its own",
             detail:
-              ", completing nearly 17,000 PCAP investigations in its first two months with no analyst click. A background reconciler queues the AI work that should exist; each dispatch commits independently behind a durable resume cursor.",
+              ", completing nearly 17,000 PCAP investigations in its first two months with no analyst click. A background reconciler queues the AI work that should exist, recording its progress durably so a crash loses nothing already queued.",
           },
           {
-            lead: "Cut the Files page query from 12.3 s to 1.5 ms",
+            lead: "Cut the main document-list query from 12.3 s to 1.5 ms",
             detail:
               " on a 7.2M-row table by moving per-document alert counts into a summary table kept exact by statement-level Postgres triggers, with a reconcile job that repairs drift.",
           },
